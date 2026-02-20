@@ -1,0 +1,97 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Snake" activeNav="">
+  <div class="snake-page">
+    <p class="snake-subtitle">in case you're bored:</p>
+    <canvas id="snakeCanvas" class="snake-canvas" width="400" height="400"></canvas>
+    <p class="snake-score">score: <span id="snakeScore">0</span></p>
+    <p class="snake-controls">use arrow keys to play &middot; space to restart</p>
+  </div>
+
+  <script>
+    let snakeInterval: number | undefined;
+
+    function initSnake() {
+      const canvas = document.getElementById('snakeCanvas') as HTMLCanvasElement;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d')!;
+      const size = 20, cols = canvas.width / size, rows = canvas.height / size;
+      let snake = [{ x: 10, y: 10 }];
+      let dir = { x: 1, y: 0 }, nextDir = { x: 1, y: 0 };
+      let food = spawnFood(), score = 0, running = true;
+
+      function spawnFood() {
+        let f;
+        do {
+          f = { x: Math.floor(Math.random() * cols), y: Math.floor(Math.random() * rows) };
+        } while (snake.some(s => s.x === f.x && s.y === f.y));
+        return f;
+      }
+
+      function draw() {
+        ctx.fillStyle = '#FFFCB8';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#f0ec9a';
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i <= cols; i++) { ctx.beginPath(); ctx.moveTo(i * size, 0); ctx.lineTo(i * size, canvas.height); ctx.stroke(); }
+        for (let i = 0; i <= rows; i++) { ctx.beginPath(); ctx.moveTo(0, i * size); ctx.lineTo(canvas.width, i * size); ctx.stroke(); }
+        ctx.fillStyle = '#c25538';
+        ctx.beginPath();
+        ctx.arc(food.x * size + size / 2, food.y * size + size / 2, size / 2 - 2, 0, Math.PI * 2);
+        ctx.fill();
+        snake.forEach((s, i) => {
+          ctx.fillStyle = i === 0 ? '#2d6a30' : '#3a8c3e';
+          ctx.fillRect(s.x * size + 1, s.y * size + 1, size - 2, size - 2);
+          ctx.strokeStyle = '#1a4a1d';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(s.x * size + 1, s.y * size + 1, size - 2, size - 2);
+        });
+      }
+
+      function update() {
+        if (!running) return;
+        dir = nextDir;
+        const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+        if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows || snake.some(s => s.x === head.x && s.y === head.y)) {
+          running = false;
+          ctx.fillStyle = 'rgba(0,0,0,0.3)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = 'white';
+          ctx.font = '24px "DM Sans", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('game over', canvas.width / 2, canvas.height / 2 - 10);
+          ctx.font = '14px "DM Sans", sans-serif';
+          ctx.fillText('press space to restart', canvas.width / 2, canvas.height / 2 + 20);
+          return;
+        }
+        snake.unshift(head);
+        if (head.x === food.x && head.y === food.y) {
+          score++;
+          document.getElementById('snakeScore')!.textContent = String(score);
+          food = spawnFood();
+        } else {
+          snake.pop();
+        }
+        draw();
+      }
+
+      document.onkeydown = (e) => {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
+        if (e.key === 'ArrowUp' && dir.y !== 1) nextDir = { x: 0, y: -1 };
+        if (e.key === 'ArrowDown' && dir.y !== -1) nextDir = { x: 0, y: 1 };
+        if (e.key === 'ArrowLeft' && dir.x !== 1) nextDir = { x: -1, y: 0 };
+        if (e.key === 'ArrowRight' && dir.x !== -1) nextDir = { x: 1, y: 0 };
+        if (e.key === ' ') { clearInterval(snakeInterval); initSnake(); }
+      };
+
+      if (snakeInterval) clearInterval(snakeInterval);
+      document.getElementById('snakeScore')!.textContent = '0';
+      draw();
+      snakeInterval = setInterval(update, 120);
+    }
+
+    initSnake();
+  </script>
+</BaseLayout>

@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About" activeNav="/about">
+  <div class="about-page">
+    <h1 class="page-title-display">ABOUT</h1>
+    <p class="about-origin">i am a paris-based creative strategist, with a background in sociology and PR. when i first created my instagram account, i was 13 years old and frustrated that already too many jojos had signed up before me to have a cool short username. as a sign of protest (or out of lack of creativity) i went with &ldquo;zuvielejojos&rdquo; which directly translates to &ldquo;too many jojos&rdquo;. Since that moment more than a decade has passed but even after leaving the country (and having many french people ask me what the hell it means) my emotional attachment to this username has grown too much to change it. as you might have also noticed by now i am allergic to capital letters.</p>
+
+    <div class="about-photo-section">
+      <img src="/images/jojoklein.png" alt="Jojo" class="about-main-photo" />
+      <p class="about-caption">this is who you're actually talking to</p>
+    </div>
+
+    <div class="skills-section">
+      <h2 class="skills-title">What I am really good at:</h2>
+      <div class="skills-grid">
+        <div class="skill-card">
+          <div class="skill-star-wrap">
+            <svg class="skill-star" viewBox="0 0 200 200"><polygon points="100,5 120,65 185,65 132,100 152,165 100,130 48,165 68,100 15,65 80,65" fill="#F472B6"/></svg>
+            <span class="skill-label">CREATIVE<br/>STRATEGY</span>
+          </div>
+          <p class="skill-desc">From Fashion to Tech: I've come up with 360 strategies for all sorts of projects. If I can understand the product, I can come up with a brand experience or concept to sell it.</p>
+        </div>
+        <div class="skill-card">
+          <div class="skill-star-wrap">
+            <svg class="skill-star" viewBox="0 0 200 200"><polygon points="100,5 120,65 185,65 132,100 152,165 100,130 48,165 68,100 15,65 80,65" fill="#F472B6"/></svg>
+            <span class="skill-label">PROJECT<br/>MANAGEMENT</span>
+          </div>
+          <p class="skill-desc">Gen-Z calls it &ldquo;Type-A Girl&rdquo; I call it Planning Freak. I love Notion so much, I even became a Template Creator. I never like to miss a deadline, so a good automated Notion Board is my best friend.</p>
+        </div>
+        <div class="skill-card">
+          <div class="skill-star-wrap">
+            <svg class="skill-star" viewBox="0 0 200 200"><polygon points="100,5 120,65 185,65 132,100 152,165 100,130 48,165 68,100 15,65 80,65" fill="#F472B6"/></svg>
+            <span class="skill-label">WRITING</span>
+          </div>
+          <p class="skill-desc">I've been blogging on and off since I was 13, so working as a copywriter came naturally. You can find some of my latest texts <a href="https://zuvielejojos.substack.com" target="_blank" style="text-decoration:underline;text-underline-offset:3px;">here.</a></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-links">
+      <a href="/pick-my-brain" class="pill-btn">pick my brain</a>
+      <a href="https://www.linkedin.com/in/johanna-schoen/" target="_blank" rel="noopener noreferrer" class="pill-btn">LinkedIn</a>
+      <a href="mailto:jojoschoen1999@gmail.com" class="pill-btn">Email</a>
+    </div>
+  </div>
+</BaseLayout>

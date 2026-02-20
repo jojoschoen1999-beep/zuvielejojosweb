@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BlogMagazine from '../components/BlogMagazine.astro';
+import { fetchSubstackPosts } from '../lib/substack';
+
+const posts = await fetchSubstackPosts(12);
+---
+
+<BaseLayout title="Thoughts" activeNav="/thoughts">
+  <div class="thoughts-page">
+    <h1 class="page-title-display">BLOG</h1>
+    <p class="thoughts-intro">I like oversharing on the internet. on this blog you'll find interviews with my fav niche internet crushes &amp; whatever thoughts, stories or obsessions feel too long for an instagram caption.</p>
+    <div class="thoughts-top-btn">
+      <a href="https://zuvielejojos.substack.com/subscribe" target="_blank" rel="noopener noreferrer" class="pill-btn">subscribe</a>
+    </div>
+
+    <BlogMagazine posts={posts} />
+
+    <div class="thoughts-bottom">
+      <a href="https://zuvielejojos.substack.com" target="_blank" rel="noopener noreferrer" class="pill-btn">all posts</a>
+    </div>
+  </div>
+</BaseLayout>

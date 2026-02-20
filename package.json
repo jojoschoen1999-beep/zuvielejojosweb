@@ -1,0 +1,15 @@
+{
+  "name": "zuvielejojos-website",
+  "type": "module",
+  "version": "2.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^4.16.0",
+    "@astrojs/netlify": "^5.5.0"
+  }
+}

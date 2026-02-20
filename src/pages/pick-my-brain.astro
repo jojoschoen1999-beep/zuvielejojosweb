@@ -1,0 +1,71 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Pick My Brain" activeNav="/pick-my-brain">
+  <img src="/images/cursor.png" alt="" class="pick-cursor" id="cursor-hand" />
+
+  <div class="pick-page" id="pick-area">
+    <h1 class="page-title-display pick-title-anim">PICK MY BRAIN</h1>
+    <p class="pick-subtitle pick-sub-anim">Need advice? I love brainstorming with people.</p>
+    <div class="pick-brain-wrap pick-entrance" id="brainWrap">
+      <img src="/images/brain.png" alt="Brain" class="pick-brain" id="pickBrain" />
+    </div>
+    <a href="https://calendar.app.google/Jroj5WyvkbMetTgd6" target="_blank" class="pill-btn pick-btn-anim">book a meeting</a>
+  </div>
+
+  <script>
+    const cursorEl = document.getElementById('cursor-hand');
+    const pickBrain = document.getElementById('pickBrain');
+    let brainShaking = false;
+    let sparkleThrottle = 0;
+
+    if (cursorEl) {
+      cursorEl.style.display = 'block';
+    }
+
+    document.addEventListener('mousemove', (e) => {
+      if (cursorEl) {
+        cursorEl.style.left = (e.clientX - 10) + 'px';
+        cursorEl.style.top = (e.clientY - 5) + 'px';
+      }
+
+      if (pickBrain) {
+        const rect = pickBrain.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dist = Math.sqrt((e.clientX - cx) ** 2 + (e.clientY - cy) ** 2);
+        const threshold = rect.width * 0.6;
+
+        if (dist < threshold) {
+          if (!brainShaking) {
+            brainShaking = true;
+            pickBrain.classList.add('shake');
+            pickBrain.addEventListener('animationend', () => {
+              pickBrain.classList.remove('shake');
+              brainShaking = false;
+            }, { once: true });
+          }
+          const now = Date.now();
+          if (now - sparkleThrottle > 150) {
+            sparkleThrottle = now;
+            spawnSparkle(rect);
+          }
+        }
+      }
+    });
+
+    function spawnSparkle(brainRect: DOMRect) {
+      const sparkle = document.createElement('span');
+      sparkle.className = 'brain-sparkle';
+      sparkle.textContent = Math.random() > 0.5 ? '\u2726' : '\u2727';
+      sparkle.style.left = (brainRect.left + Math.random() * brainRect.width) + 'px';
+      sparkle.style.top = (brainRect.top + Math.random() * brainRect.height * 0.5) + 'px';
+      sparkle.style.position = 'fixed';
+      sparkle.style.fontSize = (0.6 + Math.random() * 0.6) + 'rem';
+      document.body.appendChild(sparkle);
+      requestAnimationFrame(() => sparkle.classList.add('fall'));
+      setTimeout(() => sparkle.remove(), 1000);
+    }
+  </script>
+</BaseLayout>
