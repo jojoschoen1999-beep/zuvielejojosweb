@@ -147,7 +147,7 @@ const floors = elevatorPitch.map(({ heading, subheading, text, image, imageAlt }
 
     function fillRoom() {
       room.innerHTML = wip
-        ? '<span class="elev-big">under construction</span><span class="elev-small">this is a parisian elevator</span>'
+        ? '<span class="elev-big">under construction</span><span class="elev-small">(this is a parisian elevator)</span>'
         : `<span class="elev-num">${String(cur + 1).padStart(2, '0')}</span><span class="elev-big">${esc(floors[cur].heading)}</span>`;
     }
     function fillPanel() {
