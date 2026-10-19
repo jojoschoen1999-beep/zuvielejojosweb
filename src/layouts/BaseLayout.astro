@@ -2,15 +2,17 @@
 import '../styles/global.css';
 interface Props {
   title: string;
-  activeNav?: string;
+  onePage?: boolean;
   band?: 'yellow' | 'pink' | 'paper';
 }
-const { title, activeNav = '', band = 'yellow' } = Astro.props;
+const { title, onePage = false, band = 'yellow' } = Astro.props;
+// On the home page the nav scrolls to sections; elsewhere it jumps back to them.
+const base = onePage ? '' : '/';
 const navRight = [
-  { href: '/thoughts', label: 'thoughts' },
-  { href: '/elevator-pitch', label: 'elevator pitch' },
-  { href: '/pick-my-brain', label: 'pick my brain' },
-  { href: '/about', label: 'about' },
+  { id: 'thoughts', label: 'thoughts' },
+  { id: 'elevator-pitch', label: 'elevator pitch' },
+  { id: 'pick-my-brain', label: 'pick my brain' },
+  { id: 'about', label: 'about' },
 ];
 ---
 <!DOCTYPE html>
@@ -23,25 +25,23 @@ const navRight = [
   </head>
   <body class={`band-${band}`}>
     <header class="header">
-      <div class="wrap">
-        <nav class="nav" aria-label="Home">
-          <a href="/" class={`chip ${activeNav === '/' ? 'active' : ''}`}>home</a>
-        </nav>
-        <a href="/" class="brand-wrap" id="brandWrap">
-          <span class="brand-star">✦</span>
-          <span class="brand-star">✧</span>
-          <span class="brand-star">✦</span>
-          <span class="brand-star">✧</span>
-          <span class="brand-star">✦</span>
-          <span class="brand-star">✧</span>
-          <span class="brand">ZUVIELEJOJOS</span>
-        </a>
-        <nav class="nav nav-right" aria-label="Pages">
-          {navRight.map((l) => (
-            <a href={l.href} class={`chip ${activeNav === l.href ? 'active' : ''}`}>{l.label}</a>
-          ))}
-        </nav>
-      </div>
+      <nav class="nav nav-left" aria-label="Home">
+        <a href={onePage ? '#home' : '/'} class="chip" data-nav="home">home</a>
+      </nav>
+      <a href={onePage ? '#home' : '/'} class="brand-wrap" id="brandWrap">
+        <span class="brand-star">✦</span>
+        <span class="brand-star">✧</span>
+        <span class="brand-star">✦</span>
+        <span class="brand-star">✧</span>
+        <span class="brand-star">✦</span>
+        <span class="brand-star">✧</span>
+        <span class="brand">ZUVIELEJOJOS</span>
+      </a>
+      <nav class="nav nav-right" aria-label="Sections">
+        {navRight.map((l) => (
+          <a href={`${base}#${l.id}`} class="chip" data-nav={l.id}>{l.label}</a>
+        ))}
+      </nav>
     </header>
 
     <main>
@@ -82,6 +82,23 @@ const navRight = [
         brandWrap.addEventListener('mouseleave', () => {
           document.querySelectorAll('.brand-star').forEach(s => s.classList.remove('visible'));
         });
+      }
+
+      // Highlight the nav chip of the section you're looking at
+      const sections = document.querySelectorAll<HTMLElement>('main > section[id]');
+      const chips = document.querySelectorAll<HTMLElement>('[data-nav]');
+      const setActive = (id: string) => chips.forEach(c => c.classList.toggle('active', c.dataset.nav === id));
+      if (sections.length) {
+        const update = () => {
+          // The active section is the last one whose top has passed a line a third down the screen
+          const line = window.innerHeight * 0.33;
+          let current = sections[0].id;
+          sections.forEach(s => { if (s.getBoundingClientRect().top <= line) current = s.id; });
+          setActive(current);
+        };
+        window.addEventListener('scroll', update, { passive: true });
+        window.addEventListener('resize', update);
+        update();
       }
     </script>
   </body>

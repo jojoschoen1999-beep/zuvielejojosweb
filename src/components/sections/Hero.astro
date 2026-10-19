@@ -1,0 +1,34 @@
+<section class="section yellow hero" id="home">
+  <span class="vert" aria-hidden="true">aGkgdGhlcmUuIHdlbGNvbWUgdG8gbXkgYnJhaW4u</span>
+  <div class="wrap hero-grid">
+    <div class="hero-text">
+      <h1 class="mega hero-title">hi there. welcome to my brain.</h1>
+      <p class="lede">i wanted to have my own corner of the internet so i vibe coded this page.</p>
+      <div class="win bug-banner" role="note" id="bugBanner">
+        <div class="bar"><span>System Message</span><span>!</span></div>
+        <div class="bd">
+          <span>If you find any bugs, you can keep them &lt;3</span>
+          <div class="btnrow">
+            <button class="wbtn" type="button" data-close-banner>keep</button>
+            <button class="wbtn" type="button" data-close-banner>ok</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <a href="#pick-my-brain" class="win brain-win" title="pick my brain">
+      <div class="bar"><span>brain.png — zuvielejojos 1.1</span><span>▢</span></div>
+      <div class="bd"><div class="shot"><img src="/images/brain.png" alt="Brain. Click to pick my brain." class="brain-img" /></div></div>
+    </a>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('[data-close-banner]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const banner = document.getElementById('bugBanner');
+      if (!banner) return;
+      banner.classList.add('closing');
+      setTimeout(() => banner.remove(), 180);
+    });
+  });
+</script>

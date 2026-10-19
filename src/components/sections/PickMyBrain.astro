@@ -1,0 +1,95 @@
+<section class="section yellow" id="pick-my-brain">
+  <img src="/images/cursor.png" alt="" class="pick-cursor" id="cursor-hand" />
+  <div class="wrap stack">
+    <div class="crop"><i class="c1"></i><i class="c2"></i><h2 class="mega md">PICK MY BRAIN</h2></div>
+    <div class="grid">
+      <div class="s7">
+        <div class="dither" id="pickArea"><img src="/images/brain.png" alt="Brain" class="pick-brain" id="pickBrain" /></div>
+      </div>
+      <div class="col s5">
+        <span class="lbl">brainstorm.request</span>
+        <p class="lede">Need advice? I love brainstorming with people.</p>
+        <div class="win">
+          <div class="bar"><span>Calendar 1.1</span><span>▢</span></div>
+          <div class="bd">
+            <span id="calMonth"></span>
+            <div class="cal" id="cal" aria-hidden="true"></div>
+          </div>
+        </div>
+        <div><a href="https://calendar.app.google/Jroj5WyvkbMetTgd6" target="_blank" rel="noopener noreferrer" class="chip solid lg">book a meeting</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Little calendar strip: this week, today highlighted
+  const cal = document.getElementById('cal');
+  const calMonth = document.getElementById('calMonth');
+  if (cal && calMonth) {
+    const now = new Date();
+    calMonth.textContent = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const days = ['m', 't', 'w', 't', 'f', 's', 's'];
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+    cal.innerHTML = days.map(d => `<span>${d}</span>`).join('') +
+      Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        const on = d.toDateString() === now.toDateString();
+        return `<span class="${on ? 'on' : ''}">${d.getDate()}</span>`;
+      }).join('');
+  }
+
+  // Hand cursor shows only over the brain area; brain shakes and drops sparkles
+  const cursorEl = document.getElementById('cursor-hand');
+  const pickArea = document.getElementById('pickArea');
+  const pickBrain = document.getElementById('pickBrain');
+  const finePointer = window.matchMedia('(pointer: fine)').matches;
+  let brainShaking = false;
+  let sparkleThrottle = 0;
+
+  if (pickArea && finePointer) {
+    pickArea.addEventListener('mouseenter', () => { if (cursorEl) cursorEl.style.display = 'block'; pickArea.style.cursor = 'none'; });
+    pickArea.addEventListener('mouseleave', () => { if (cursorEl) cursorEl.style.display = 'none'; });
+  }
+
+  pickArea?.addEventListener('mousemove', (e) => {
+    if (cursorEl && finePointer) {
+      cursorEl.style.left = (e.clientX - 10) + 'px';
+      cursorEl.style.top = (e.clientY - 5) + 'px';
+    }
+    if (!pickBrain) return;
+    const rect = pickBrain.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dist = Math.sqrt((e.clientX - cx) ** 2 + (e.clientY - cy) ** 2);
+    if (dist < rect.width * 0.6) {
+      if (!brainShaking) {
+        brainShaking = true;
+        pickBrain.classList.add('shake');
+        pickBrain.addEventListener('animationend', () => {
+          pickBrain.classList.remove('shake');
+          brainShaking = false;
+        }, { once: true });
+      }
+      const now = Date.now();
+      if (now - sparkleThrottle > 150) {
+        sparkleThrottle = now;
+        spawnSparkle(rect);
+      }
+    }
+  });
+
+  function spawnSparkle(brainRect: DOMRect) {
+    const sparkle = document.createElement('span');
+    sparkle.className = 'brain-sparkle';
+    sparkle.textContent = Math.random() > 0.5 ? '✦' : '✧';
+    sparkle.style.left = (brainRect.left + Math.random() * brainRect.width) + 'px';
+    sparkle.style.top = (brainRect.top + Math.random() * brainRect.height * 0.5) + 'px';
+    sparkle.style.fontSize = (0.6 + Math.random() * 0.6) + 'rem';
+    document.body.appendChild(sparkle);
+    requestAnimationFrame(() => sparkle.classList.add('fall'));
+    setTimeout(() => sparkle.remove(), 1000);
+  }
+</script>

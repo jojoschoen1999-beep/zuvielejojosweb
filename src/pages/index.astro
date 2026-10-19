@@ -1,24 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/sections/Hero.astro';
+import Thoughts from '../components/sections/Thoughts.astro';
+import ElevatorPitch from '../components/sections/ElevatorPitch.astro';
+import PickMyBrain from '../components/sections/PickMyBrain.astro';
+import About from '../components/sections/About.astro';
 ---
 
-<BaseLayout title="Home" activeNav="/" band="yellow">
-  <section class="page home">
-    <span class="vert" aria-hidden="true">aGkgdGhlcmUuIHdlbGNvbWUgdG8gbXkgYnJhaW4u</span>
-    <div class="wrap stack">
-      <div class="win brain-win">
-        <div class="bar"><span>brain.png — zuvielejojos 1.1</span><span>▢</span></div>
-        <div class="bd"><div class="shot"><img src="/images/brain.png" alt="Brain" class="brain-img" /></div></div>
-      </div>
-      <h1 class="mega">hi there. welcome to my brain.</h1>
-      <p class="lede" style="max-width:36ch">i wanted to have my own corner of the internet so i vibe coded this page.</p>
-      <div class="win" style="width:min(340px,100%)" role="note">
-        <div class="bar"><span>System Message</span><span>!</span></div>
-        <div class="bd">
-          <span>If you find any bugs, you can keep them &lt;3</span>
-          <div class="btnrow"><button class="wbtn" type="button">keep</button><button class="wbtn" type="button">ok</button></div>
-        </div>
-      </div>
-    </div>
-  </section>
+<BaseLayout title="Home" onePage>
+  <Hero />
+  <Thoughts />
+  <ElevatorPitch />
+  <PickMyBrain />
+  <About />
 </BaseLayout>
