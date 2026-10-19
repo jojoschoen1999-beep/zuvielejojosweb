@@ -11,7 +11,8 @@ const floors = elevatorPitch.map(({ heading, subheading, text, image, imageAlt }
     <div class="elev-stage" data-stage>
       <canvas width="96" height="84" aria-label="Pixel elevator" data-canvas></canvas>
       <div class="elev-room" data-room aria-live="polite"></div>
-      <button class="elev-hit" type="button" data-call aria-label="Call the elevator"></button>
+      <button class="elev-hit" type="button" data-call="1" aria-label={underConstruction ? 'Open or close the doors' : 'Go up'}></button>
+      <button class="elev-hit" type="button" data-call="-1" aria-label={underConstruction ? 'Open or close the doors' : 'Go down'}></button>
     </div>
     {!underConstruction && (
       <div class="elev-ctrls">
@@ -83,12 +84,12 @@ const floors = elevatorPitch.map(({ heading, subheading, text, image, imageAlt }
     const cv = root.querySelector<HTMLCanvasElement>('[data-canvas]')!;
     const g = cv.getContext('2d')!;
     const room = root.querySelector<HTMLElement>('[data-room]')!;
-    const call = root.querySelector<HTMLButtonElement>('[data-call]')!;
+    const calls = root.querySelectorAll<HTMLButtonElement>('[data-call]');
     const status = root.querySelector<HTMLElement>('[data-status]');
     const panel = root.querySelector<HTMLElement>('[data-panel]');
     const dirBtns = root.querySelectorAll<HTMLButtonElement>('[data-dir]');
 
-    let cur = 0, open = 0, dir = 0, busy = true, blink = false;
+    let cur = 0, open = 0, dir = 0, busy = true, pressed = 0;
 
     const px = (x: number, y: number, w: number, h: number, c: string) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
     const glyph = (rows: string[], x: number, y: number, c: string) => rows.forEach((r, j) => [...r].forEach((b, i) => { if (b === '1') px(x + i, y + j, 1, 1, c); }));
@@ -124,11 +125,11 @@ const floors = elevatorPitch.map(({ heading, subheading, text, image, imageAlt }
       g.restore();
       // floor indicator
       box(40, 4, 17, 9, C.ink);
-      if (wip) glyph(DIG[0], 47, 6, blink ? C.ink : C.pink);
+      if (wip) glyph(DIG[0], 47, 6, C.pink);
       else { glyph(DIG[(cur + 1) % 10], 43, 6, C.pink); if (dir) glyph(dir > 0 ? UP : DOWN, 49, 7, C.pink); }
-      // call button
+      // call buttons (top: up, bottom: down; both open/close the doors while under construction)
       box(78, 40, 7, 12, C.g2);
-      px(80, 42, 3, 3, dir > 0 ? C.pink : C.g4); px(80, 47, 3, 3, dir < 0 ? C.pink : C.g4);
+      px(80, 42, 3, 3, dir > 0 || pressed > 0 ? C.pink : C.g4); px(80, 47, 3, 3, dir < 0 || pressed < 0 ? C.pink : C.g4);
     }
 
     function fit() {
@@ -138,12 +139,15 @@ const floors = elevatorPitch.map(({ heading, subheading, text, image, imageAlt }
       stage.style.setProperty('--s', String(s));
       const [dx, dy, dw, dh] = D;
       Object.assign(room.style, { left: dx * s + 'px', top: dy * s + 'px', width: dw * s + 'px', height: dh * s + 'px' });
-      Object.assign(call.style, { left: 78 * s + 'px', top: 40 * s + 'px', width: 7 * s + 'px', height: 12 * s + 'px' });
+      calls.forEach(b => {
+        const top = Number(b.dataset.call) > 0 ? 40 : 46;
+        Object.assign(b.style, { left: 78 * s + 'px', top: top * s + 'px', width: 7 * s + 'px', height: 6 * s + 'px' });
+      });
     }
 
     function fillRoom() {
       room.innerHTML = wip
-        ? '<span class="elev-big">under construction</span><span class="elev-small">come back soon</span>'
+        ? '<span class="elev-big">under construction</span><span class="elev-small">this is a parisian elevator</span>'
         : `<span class="elev-num">${String(cur + 1).padStart(2, '0')}</span><span class="elev-big">${esc(floors[cur].heading)}</span>`;
     }
     function fillPanel() {
@@ -175,19 +179,24 @@ const floors = elevatorPitch.map(({ heading, subheading, text, image, imageAlt }
       await wait(250); dir = 0; fillPanel(); panel?.classList.remove('fading');
       await openDoors(); sync(); busy = false;
     }
-    async function wiggle() {
+    // While under construction, the wall buttons just open and close the doors
+    async function toggleDoors(which: number) {
       if (busy) return; busy = true;
-      for (let i = 0; i < 4; i++) { blink = !blink; draw(); await wait(160); }
-      blink = false; draw(); busy = false;
+      pressed = which; draw();
+      if (open > 0.5) await closeDoors(); else await openDoors();
+      pressed = 0; draw(); busy = false;
     }
 
     dirBtns.forEach(b => b.addEventListener('click', () => go(cur + Number(b.dataset.dir))));
-    call.addEventListener('click', () => (wip ? wiggle() : go(cur === N - 1 ? 0 : cur + 1)));
+    calls.forEach(b => b.addEventListener('click', () => {
+      const which = Number(b.dataset.call);
+      if (wip) toggleDoors(which); else go(cur + which);
+    }));
 
     fillPanel(); sync(); draw(); fit();
     addEventListener('resize', fit);
 
-    // Doors stay closed until the elevator is on screen, then open after 1 second
+    // Doors stay closed until the elevator is on screen, then open after 2 seconds
     let started = false;
     const check = async () => {
       if (started) return;
@@ -196,7 +205,7 @@ const floors = elevatorPitch.map(({ heading, subheading, text, image, imageAlt }
       if (visible < r.height * 0.4) return;
       started = true;
       removeEventListener('scroll', check);
-      await wait(1000);
+      await wait(2000);
       await openDoors();
       busy = false;
     };
