@@ -5,6 +5,10 @@ import Thoughts from '../components/sections/Thoughts.astro';
 import ElevatorPitch from '../components/sections/ElevatorPitch.astro';
 import PickMyBrain from '../components/sections/PickMyBrain.astro';
 import About from '../components/sections/About.astro';
+
+// Let Netlify's CDN keep the page for 10 minutes, so the Substack feed
+// isn't fetched on every single visit (and a Substack outage doesn't break the page)
+Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=600, stale-while-revalidate=86400');
 ---
 
 <BaseLayout title="Home" onePage>

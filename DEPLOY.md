@@ -1,50 +1,32 @@
 # How to update your website
 
-## Step 1: Replace the files
+This folder (`~/Sites/zuvielejojosweb-github`) is connected to GitHub.
+Netlify rebuilds zuvielejojos.xyz automatically whenever `main` changes.
 
-Open Terminal and run these commands one by one:
+## 1. Make your changes
 
-```
-cd /Users/jojo/Downloads
-```
+Edit files in this folder (or ask Claude to). Text for the elevator pitch
+lives in `src/data/elevatorPitch.ts`.
 
-If you still have the old `website` folder, delete it:
-```
-rm -rf website
-```
-
-Unzip the new download (replace the filename if needed):
-```
-unzip zuvielejojos-website.zip
-```
-
-## Step 2: Test locally (optional but recommended)
+## 2. Save them as a commit
 
 ```
-cd website
-npm install
-npm run dev
+cd ~/Sites/zuvielejojosweb-github
+git add -A
+git commit -m "Describe what you changed"
 ```
 
-Then open http://localhost:4321 in your browser to check everything looks good.
-Press Ctrl+C to stop the local server when done.
-
-## Step 3: Push to GitHub
+## 3. Push to GitHub
 
 ```
-cd /Users/jojo/Downloads/website
-git init
-git add .
-git commit -m "Website v2 - brain theme update"
-git remote add origin https://github.com/jojoschoen1999-beep/zuvielejojosweb.git
-git push -u origin main --force
+git push origin main
 ```
 
-The `--force` is important because it replaces all the old code on GitHub.
+If it asks for a password, paste a GitHub token (not your GitHub password).
+Nothing shows while you paste; press Enter.
 
-## Step 4: Wait for Netlify
+## 4. Wait for Netlify
 
-Netlify will automatically detect the new code and rebuild your site.
-This usually takes 1-2 minutes. You can watch the progress at app.netlify.com.
+The live site updates within 1–2 minutes. You can watch it at app.netlify.com.
 
-That's it! Your site at zuvielejojos.xyz will be updated automatically.
+Never use `git push --force`: it would overwrite the site's history on GitHub.

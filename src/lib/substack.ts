@@ -42,6 +42,14 @@ function extractEnclosure(xml: string): string {
   return m ? m[1] : '';
 }
 
+// Only allow normal web links from the feed (never javascript: or data: URLs)
+function safeUrl(url: string): string {
+  try {
+    const u = new URL(decodeEntities(url));
+    return u.protocol === 'https:' || u.protocol === 'http:' ? u.href : '';
+  } catch { return ''; }
+}
+
 function parseItems(xml: string): Post[] {
   const items: Post[] = [];
   const re = /<item>([\s\S]*?)<\/item>/gi;
@@ -51,10 +59,10 @@ function parseItems(xml: string): Post[] {
     const content = parseXmlTag(x, 'content:encoded') || parseXmlTag(x, 'description');
     items.push({
       title: decodeEntities(parseXmlTag(x, 'title')),
-      link: parseXmlTag(x, 'link'),
+      link: safeUrl(parseXmlTag(x, 'link')),
       pubDate: parseXmlTag(x, 'pubDate'),
       excerpt: extractExcerpt(content),
-      image: extractEnclosure(x) || extractFirstImage(content),
+      image: safeUrl(extractEnclosure(x) || extractFirstImage(content)),
       categories: [],
     });
   }
@@ -65,8 +73,10 @@ export async function fetchSubstackPosts(limit = 12): Promise<Post[]> {
   try {
     const res = await fetch('https://zuvielejojos.substack.com/feed', {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AstroBot/1.0)' },
+      // Give up after 5s so a slow Substack never stalls the whole page
+      signal: AbortSignal.timeout(5000),
     });
     if (!res.ok) return [];
-    return parseItems(await res.text()).slice(0, limit);
+    return parseItems(await res.text()).filter(p => p.link).slice(0, limit);
   } catch { return []; }
 }

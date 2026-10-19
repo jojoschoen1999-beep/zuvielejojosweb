@@ -3,9 +3,8 @@ import '../styles/global.css';
 interface Props {
   title: string;
   onePage?: boolean;
-  band?: 'yellow' | 'pink' | 'paper';
 }
-const { title, onePage = false, band = 'yellow' } = Astro.props;
+const { title, onePage = false } = Astro.props;
 // On the home page the nav scrolls to sections; elsewhere it jumps back to them.
 const base = onePage ? '' : '/';
 const navRight = [
@@ -23,7 +22,7 @@ const navRight = [
     <title>{title} — ZUVIELEJOJOS</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
-  <body class={`band-${band}`}>
+  <body>
     <header class="header">
       <nav class="nav nav-left" aria-label="Home">
         <a href={onePage ? '#home' : '/'} class="chip" data-nav="home">home</a>
@@ -51,7 +50,21 @@ const navRight = [
     <footer class="footer">
       <div class="wrap stack">
         <div class="glyph" aria-hidden="true"><span>✦ ✧</span><span>✧ ✦</span></div>
-        <div class="foot-mark">ZUVIELEJOJOS</div>
+        <div class="foot-mark-wrap" aria-hidden="true">
+          <span class="spark" style="left:2%;top:8%;font-size:30px;animation-delay:0s">✦</span>
+          <span class="spark p" style="left:9%;top:70%;font-size:22px;animation-delay:0.6s">✧</span>
+          <span class="spark w" style="left:16%;top:18%;font-size:18px;animation-delay:1.2s">✦</span>
+          <span class="spark" style="left:24%;top:82%;font-size:26px;animation-delay:0.3s">✧</span>
+          <span class="spark p" style="left:33%;top:4%;font-size:20px;animation-delay:1.6s">✦</span>
+          <span class="spark w" style="left:46%;top:90%;font-size:18px;animation-delay:0.9s">✧</span>
+          <span class="spark" style="left:58%;top:2%;font-size:24px;animation-delay:1.9s">✦</span>
+          <span class="spark p" style="left:67%;top:86%;font-size:20px;animation-delay:0.4s">✦</span>
+          <span class="spark w" style="left:76%;top:10%;font-size:18px;animation-delay:1.4s">✧</span>
+          <span class="spark" style="left:84%;top:74%;font-size:28px;animation-delay:0.7s">✦</span>
+          <span class="spark p" style="left:92%;top:22%;font-size:22px;animation-delay:1.1s">✧</span>
+          <span class="spark w" style="left:97%;top:64%;font-size:18px;animation-delay:2.1s">✦</span>
+          <div class="foot-mark">ZUVIELEJOJOS</div>
+        </div>
         <div class="foot">
           <span>zuvielejojos © {new Date().getFullYear()}</span>
           <span>made in paris. vibe coded with very little patience<span class="blink">_</span></span>
