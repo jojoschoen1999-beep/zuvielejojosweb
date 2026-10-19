@@ -213,8 +213,3 @@ p { max-width: 60ch; }
 .glider b { width: 8px; height: 8px; background: var(--paper); }
 .glider b.on { background: var(--ink); }
 @media (max-width: 700px) { .snake-float { display: none; } }
-.bar-extra { font-family: var(--font-pixel); font-size: 17px; font-weight: 400; letter-spacing: .02em; }
-.bar-extra .glider { grid-template-columns: repeat(3, 4px); gap: 1px; padding: 1px; }
-.bar-extra .glider b { width: 4px; height: 4px; }
-@media (min-width: 861px) { .float-btn { display: none; } }
-@media (max-width: 860px) { .bar-extra { display: none; } }
