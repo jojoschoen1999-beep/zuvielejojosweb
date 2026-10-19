@@ -6,18 +6,22 @@ import { fetchSubstackPosts } from '../lib/substack';
 const posts = await fetchSubstackPosts(12);
 ---
 
-<BaseLayout title="Thoughts" activeNav="/thoughts">
-  <div class="thoughts-page">
-    <h1 class="page-title-display">BLOG</h1>
-    <p class="thoughts-intro">I like oversharing on the internet. on this blog you'll find interviews with my fav niche internet crushes &amp; whatever thoughts, stories or obsessions feel too long for an instagram caption.</p>
-    <div class="thoughts-top-btn">
-      <a href="https://zuvielejojos.substack.com/subscribe" target="_blank" rel="noopener noreferrer" class="pill-btn">subscribe</a>
+<BaseLayout title="Thoughts" activeNav="/thoughts" band="pink">
+  <section class="page">
+    <div class="wrap stack">
+      <div class="crop"><i class="c1"></i><i class="c2"></i><h1 class="mega md">BLOG</h1></div>
+      <div class="grid">
+        <div class="s5"><span class="tag">thoughts.substack</span></div>
+        <div class="col s7">
+          <span class="lbl">about this blog</span>
+          <p>I like oversharing on the internet. on this blog you'll find interviews with my fav niche internet crushes &amp; whatever thoughts, stories or obsessions feel too long for an instagram caption.</p>
+          <div><a href="https://zuvielejojos.substack.com/subscribe" target="_blank" rel="noopener noreferrer" class="chip solid lg">subscribe</a></div>
+        </div>
+      </div>
+      <BlogMagazine posts={posts} />
+      <div class="center">
+        <a href="https://zuvielejojos.substack.com" target="_blank" rel="noopener noreferrer" class="chip lg">all posts</a>
+      </div>
     </div>
-
-    <BlogMagazine posts={posts} />
-
-    <div class="thoughts-bottom">
-      <a href="https://zuvielejojos.substack.com" target="_blank" rel="noopener noreferrer" class="pill-btn">all posts</a>
-    </div>
-  </div>
+  </section>
 </BaseLayout>

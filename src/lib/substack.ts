@@ -7,10 +7,15 @@ export interface Post {
   categories: string[];
 }
 
+function decodeEntities(s: string): string {
+  return s.replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
+    .replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+}
+
 function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'").replace(/\s+/g, ' ').trim();
+  return decodeEntities(html.replace(/<[^>]*>/g, '')).replace(/\s+/g, ' ').trim();
 }
 
 function extractExcerpt(desc: string, max = 140): string {
@@ -45,7 +50,7 @@ function parseItems(xml: string): Post[] {
     const x = m[1];
     const content = parseXmlTag(x, 'content:encoded') || parseXmlTag(x, 'description');
     items.push({
-      title: parseXmlTag(x, 'title'),
+      title: decodeEntities(parseXmlTag(x, 'title')),
       link: parseXmlTag(x, 'link'),
       pubDate: parseXmlTag(x, 'pubDate'),
       excerpt: extractExcerpt(content),

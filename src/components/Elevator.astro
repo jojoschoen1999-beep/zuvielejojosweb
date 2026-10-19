@@ -1,0 +1,340 @@
+---
+import { elevatorPitch } from '../data/elevatorPitch';
+
+const floors = elevatorPitch.length;
+// Highest floor sits at the top of the shaft, floor 1 at the bottom.
+const stacked = elevatorPitch.map((f, i) => ({ ...f, floor: i + 1 })).reverse();
+---
+
+<section class="elev-scene" data-elevator data-floors={floors}>
+  <h1 class="elev-title">this is my elevator pitch:</h1>
+
+  <div class="elev">
+    <div class="elev-head">
+      <div class="elev-display" aria-live="polite">
+        <span class="elev-arrow" data-arrow></span>
+        <span class="elev-floor" data-floor>1</span>
+      </div>
+    </div>
+
+    <div class="elev-body">
+      <div class="elev-jamb" aria-hidden="true"></div>
+
+      <div class="elev-opening">
+        <div class="elev-cabin" data-cabin inert>
+          <div class="cabin-shaft">
+            <div class="cabin-track" data-track style={`height:${floors * 100}%`}>
+              {stacked.map((f) => (
+                <article class="cabin-page" data-page={f.floor} style={`height:${100 / floors}%`}>
+                  <h2 class="pg-heading">{f.heading}</h2>
+                  <p class="pg-sub">{f.subheading}</p>
+                  <p class="pg-text">{f.text}</p>
+                  {f.image
+                    ? <img class="pg-img" src={f.image} alt={f.imageAlt} loading="lazy" />
+                    : <div class="pg-img pg-img-ph">picture goes here</div>}
+                </article>
+              ))}
+            </div>
+          </div>
+          <div class="cabin-lights" aria-hidden="true"><span></span><span></span></div>
+          <div class="cabin-depth" aria-hidden="true"></div>
+        </div>
+        <div class="door door-left" aria-hidden="true"></div>
+        <div class="door door-right" aria-hidden="true"></div>
+      </div>
+
+      <div class="elev-jamb elev-jamb-panel">
+        <div class="elev-panel">
+          <button class="ebtn" data-dir="up" aria-label="Up">
+            <svg viewBox="0 0 20 20" width="14" height="14"><path d="M10 4 L17 15 H3 Z" fill="currentColor"/></svg>
+          </button>
+          <button class="ebtn" data-dir="down" aria-label="Down">
+            <svg viewBox="0 0 20 20" width="14" height="14"><path d="M10 16 L3 5 H17 Z" fill="currentColor"/></svg>
+          </button>
+          <button class="ebtn ebtn-close" data-close aria-label="Close doors" tabindex="-1">
+            <svg viewBox="0 0 24 20" width="16" height="14"><path d="M1 3 L10 10 L1 17 Z M23 3 L14 10 L23 17 Z" fill="currentColor"/><rect x="11.2" y="2" width="1.6" height="16" fill="currentColor"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="elev-sill" aria-hidden="true"></div>
+  </div>
+</section>
+
+<style>
+  .elev-scene {
+    --door: 1000ms;
+    --ride: 1100ms;
+    --steel-brush: repeating-linear-gradient(90deg, rgba(255,255,255,0.1) 0 1px, rgba(0,0,0,0.016) 1px 3px);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0.4rem 16px 2rem;
+  }
+  .elev-title { font-family: var(--font-body); font-weight: 400; font-size: 1.15rem; line-height: 1.7; margin-bottom: 1.2rem; }
+
+
+  /* ── Frame ── */
+  .elev {
+    container-type: inline-size;
+    --jamb: 15cqw;
+    width: min(640px, 72vw, calc((100svh - 210px) * 0.88)); aspect-ratio: 8 / 9;
+    display: flex; flex-direction: column;
+    border-radius: 5px 5px 2px 2px;
+    background: var(--steel-brush), linear-gradient(180deg, #f5f6f7 0%, #dfe2e4 55%, #ccd0d3 100%);
+    box-shadow:
+      0 24px 50px -12px rgba(90,70,10,0.28),
+      0 4px 12px rgba(90,70,10,0.08),
+      inset 0 1px 0 rgba(255,255,255,0.9),
+      inset 0 0 0 1px rgba(0,0,0,0.07);
+  }
+  .elev-head { height: 12cqw; display: flex; align-items: center; justify-content: center; }
+  .elev-display {
+    display: flex; align-items: center; justify-content: center; gap: 0.35em;
+    min-width: 15cqw; height: 6.2cqw; padding: 0 1.6cqw;
+    background: #121412; border-radius: 2px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.8), 0 0 0 2px #b8bcbf, 0 0 0 3px #eef0f1;
+    font-family: 'Courier New', ui-monospace, monospace; font-weight: 700;
+    font-size: clamp(0.8rem, 4.2cqw, 1.35rem); line-height: 1;
+    color: #45ff7a; text-shadow: 0 0 6px rgba(69,255,122,0.7);
+  }
+  .elev-arrow { font-size: 0.6em; min-width: 0.7em; }
+
+  .elev-body { flex: 1; display: flex; min-height: 0; }
+  .elev-jamb { flex: 0 0 var(--jamb); }
+  .elev-jamb-panel { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+  .elev-opening {
+    flex: 1; position: relative; overflow: hidden;
+    background: #2c3033;
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.45),
+      0 0 0 1.4cqw #aab0b4,
+      0 0 0 calc(1.4cqw + 1px) rgba(0,0,0,0.22),
+      0 0 0 calc(1.4cqw + 2px) rgba(255,255,255,0.7);
+  }
+  .elev-opening::after {
+    content: ''; position: absolute; inset: 0; z-index: 4; pointer-events: none;
+    box-shadow: inset 0 10px 12px -8px rgba(0,0,0,0.45), inset 0 -4px 6px -4px rgba(0,0,0,0.3);
+  }
+  .elev-sill {
+    height: 3.2cqw; margin: 0 calc(var(--jamb) - 2cqw);
+    background:
+      linear-gradient(180deg, transparent 42%, #3b3f42 42% 58%, transparent 58%),
+      repeating-linear-gradient(90deg, #9fa5a9 0 2px, #c9cdd0 2px 5px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.3), 0 1px 0 rgba(0,0,0,0.15);
+  }
+
+  /* ── Doors ── */
+  .door {
+    position: absolute; top: 0; bottom: 0; width: 50%; z-index: 3;
+    background:
+      linear-gradient(180deg, transparent 86%, rgba(0,0,0,0.1) 86%, rgba(0,0,0,0.1) calc(86% + 1px), rgba(255,255,255,0.12) calc(86% + 1px)),
+      linear-gradient(112deg, transparent 22%, rgba(255,255,255,0.45) 38%, transparent 52%, transparent 66%, rgba(255,255,255,0.18) 74%, transparent 82%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0 1px, rgba(0,0,0,0.025) 1px 3px),
+      linear-gradient(180deg, #d9dde0 0%, #bfc4c8 40%, #cfd3d6 70%, #b3b8bc 100%);
+    transition: transform var(--door) cubic-bezier(0.55, 0, 0.25, 1);
+  }
+  .door-left {
+    left: 0;
+    box-shadow:
+      inset -1px 0 0 #1f2224, inset -2px 0 0 rgba(255,255,255,0.35),
+      inset 1px 0 0 rgba(255,255,255,0.5), inset 0 1px 0 rgba(255,255,255,0.5),
+      inset -16px 0 18px -14px rgba(0,0,0,0.35);
+  }
+  .door-right {
+    right: 0;
+    box-shadow:
+      inset 1px 0 0 #1f2224, inset 2px 0 0 rgba(255,255,255,0.35),
+      inset -1px 0 0 rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.5),
+      inset 16px 0 18px -14px rgba(0,0,0,0.35);
+  }
+  .is-open .door-left  { transform: translateX(-101%); }
+  .is-open .door-right { transform: translateX(101%); }
+
+  /* ── Cabin ── */
+  .elev-cabin {
+    position: absolute; inset: 0;
+    background: var(--steel-brush), linear-gradient(90deg, #c9cdd0 0%, #eceeef 30%, #f4f5f6 50%, #eceeef 70%, #c9cdd0 100%);
+  }
+  .cabin-shaft { position: absolute; inset: 0; overflow: hidden; }
+  .cabin-track { position: relative; transition: transform var(--ride) cubic-bezier(0.65, 0, 0.35, 1); }
+  .cabin-page {
+    overflow-y: auto; overscroll-behavior: contain;
+    padding: 20cqw 10% 16cqw;
+    scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.25) transparent;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .pg-heading { font-family: var(--font-display); font-weight: normal; font-size: clamp(1.7rem, 9cqw, 2.6rem); letter-spacing: 0.04em; line-height: 1.1; margin-bottom: 0.3rem; }
+  .pg-sub { font-weight: 500; font-size: clamp(0.85rem, 3.4cqw, 1rem); color: var(--text-muted); margin-bottom: 0.9rem; }
+  .pg-text { font-size: clamp(0.85rem, 3.3cqw, 0.98rem); line-height: 1.6; margin-bottom: 1.1rem; }
+  .pg-img { display: block; width: 100%; height: auto; border-radius: 3px; box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
+  .pg-img-ph {
+    aspect-ratio: 4 / 3; display: grid; place-items: center;
+    border: 1.5px dashed rgba(0,0,0,0.25); box-shadow: none;
+    font-size: 0.8rem; color: var(--text-faint);
+  }
+
+  .cabin-lights { position: absolute; inset: 0 0 auto; height: 45%; pointer-events: none; z-index: 1; display: flex; justify-content: center; gap: 14%; }
+  .cabin-lights::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 35% 80% at 32% 0%, rgba(255,255,255,0.85), transparent 70%),
+                radial-gradient(ellipse 35% 80% at 68% 0%, rgba(255,255,255,0.85), transparent 70%);
+  }
+  .cabin-lights span {
+    width: 26%; height: 3.2cqw; margin-top: 2.4cqw;
+    background: #fff; border-radius: 1px;
+    box-shadow: 0 0 18px 6px rgba(255,255,255,1), 0 6px 30px 10px rgba(255,255,250,0.6), inset 0 0 0 1px rgba(0,0,0,0.08);
+  }
+  .cabin-depth {
+    position: absolute; inset: 0; pointer-events: none; z-index: 1;
+    box-shadow: inset 22px 0 26px -16px rgba(0,0,0,0.28), inset -22px 0 26px -16px rgba(0,0,0,0.28), inset 0 18px 20px -14px rgba(0,0,0,0.25);
+    background: linear-gradient(180deg, transparent 88%, rgba(0,0,0,0.12) 100%);
+  }
+
+  /* ── Call panel ── */
+  .elev-panel {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    padding: 2.2cqw 1.6cqw; border-radius: 4px;
+    background: var(--steel-brush), linear-gradient(180deg, #f2f3f4, #d3d6d8);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(0,0,0,0.1);
+  }
+  .ebtn {
+    width: clamp(30px, 7.5cqw, 40px); height: clamp(30px, 7.5cqw, 40px); border: none; border-radius: 50%;
+    display: grid; place-items: center; cursor: pointer;
+    color: #5a5f63;
+    background: radial-gradient(circle at 35% 30%, #fdfdfd, #cfd2d5 65%, #aab0b4);
+    box-shadow: 0 0 0 2px #b4b9bc, 0 0 0 3.5px #f1f2f3, 0 2px 5px rgba(0,0,0,0.25);
+    transition: color 0.2s, box-shadow 0.25s, transform 0.1s, opacity 0.3s;
+  }
+  .ebtn:active { transform: scale(0.93); }
+  .ebtn:focus-visible { outline: 2px solid var(--pink); outline-offset: 5px; }
+  .ebtn.lit {
+    color: #ff9a2a;
+    box-shadow: 0 0 0 2px #ffb257, 0 0 0 3.5px #fff2de, 0 0 14px 3px rgba(255,160,50,0.55);
+  }
+  .ebtn[aria-disabled='true'] { opacity: 0.45; cursor: default; }
+  .ebtn-close { opacity: 0; pointer-events: none; }
+  .is-open .ebtn-close { opacity: 1; pointer-events: auto; }
+
+  .elev-scene:not(.is-open) .elev { cursor: pointer; }
+
+  @media (max-width: 800px) {
+    .elev-scene { padding-top: 0; padding-bottom: 0; }
+    .elev-title { margin-bottom: 0.6rem; }
+    .elev { width: calc(100vw - 32px); aspect-ratio: auto; height: min(calc((100vw - 32px) * 1.55), calc(100svh - 290px)); }
+    .elev-jamb-panel { gap: 6px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .elev-scene { --door: 400ms; --ride: 300ms; }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-elevator]');
+  if (root) {
+    const N = Number(root.dataset.floors);
+    const track = root.querySelector<HTMLElement>('[data-track]')!;
+    const cabin = root.querySelector<HTMLElement>('[data-cabin]')!;
+    const floorEl = root.querySelector<HTMLElement>('[data-floor]')!;
+    const arrowEl = root.querySelector<HTMLElement>('[data-arrow]')!;
+    const upBtn = root.querySelector<HTMLButtonElement>('[data-dir="up"]')!;
+    const downBtn = root.querySelector<HTMLButtonElement>('[data-dir="down"]')!;
+    const closeBtn = root.querySelector<HTMLButtonElement>('[data-close]')!;
+    const pages = [...root.querySelectorAll<HTMLElement>('[data-page]')];
+
+    const ms = (v: string) => parseFloat(getComputedStyle(root).getPropertyValue(v));
+    const DOOR = ms('--door');
+    const RIDE = ms('--ride');
+    const wait = (t: number) => new Promise((r) => setTimeout(r, t));
+
+    let floor = 1;
+    let open = false;
+    let busy = false;
+
+    const place = (f: number, animate: boolean) => {
+      track.style.transition = animate ? '' : 'none';
+      track.style.transform = `translateY(${(-(N - f) * 100) / N}%)`;
+      pages.forEach((p) => (p.inert = Number(p.dataset.page) !== f));
+    };
+
+    const refresh = () => {
+      floorEl.textContent = String(floor);
+      upBtn.setAttribute('aria-disabled', String(open && floor >= N));
+      downBtn.setAttribute('aria-disabled', String(open && floor <= 1));
+    };
+
+    const light = (btn: HTMLElement, on: boolean) => btn.classList.toggle('lit', on);
+
+    async function openDoors(btn?: HTMLElement) {
+      busy = true;
+      if (btn) light(btn, true);
+      open = true;
+      root!.classList.add('is-open', 'was-opened');
+      cabin.inert = false;
+      closeBtn.tabIndex = 0;
+      refresh();
+      await wait(DOOR);
+      if (btn) light(btn, false);
+      busy = false;
+    }
+
+    async function ride(to: number, btn: HTMLElement) {
+      busy = true;
+      light(btn, true);
+      arrowEl.textContent = to > floor ? '▲' : '▼';
+      pages.find((p) => Number(p.dataset.page) === to)!.scrollTop = 0;
+      place(to, true);
+      await wait(RIDE / 2);
+      floor = to;
+      refresh();
+      await wait(RIDE / 2);
+      arrowEl.textContent = '';
+      light(btn, false);
+      busy = false;
+    }
+
+    async function closeDoors() {
+      busy = true;
+      light(closeBtn, true);
+      open = false;
+      root!.classList.remove('is-open');
+      cabin.inert = true;
+      closeBtn.tabIndex = -1;
+      refresh();
+      await wait(DOOR);
+      light(closeBtn, false);
+      // Ride back down to the ground floor behind closed doors.
+      if (floor > 1) arrowEl.textContent = '▼';
+      while (floor > 1) {
+        await wait(220);
+        floor--;
+        refresh();
+      }
+      arrowEl.textContent = '';
+      place(1, false);
+      busy = false;
+    }
+
+    const press = (dir: 'up' | 'down', btn: HTMLElement) => {
+      if (busy) return;
+      if (!open) return openDoors(btn);
+      if (dir === 'up' && floor < N) ride(floor + 1, btn);
+      if (dir === 'down' && floor > 1) ride(floor - 1, btn);
+    };
+
+    // Clicking anywhere on the closed elevator opens the doors.
+    root.querySelector<HTMLElement>('.elev')!.addEventListener('click', (e) => {
+      if (open || busy || (e.target as HTMLElement).closest('button')) return;
+      openDoors();
+    });
+    upBtn.addEventListener('click', () => press('up', upBtn));
+    downBtn.addEventListener('click', () => press('down', downBtn));
+    closeBtn.addEventListener('click', () => !busy && open && closeDoors());
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && open && !busy) closeDoors();
+    });
+
+    place(1, false);
+    refresh();
+  }
+</script>
