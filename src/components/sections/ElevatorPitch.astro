@@ -1,26 +1,11 @@
 ---
-// Placeholder for now. The elevator prototype from Sep 30 is still in
-// src/components/Elevator.astro and src/data/elevatorPitch.ts for later.
+import Elevator from '../Elevator.astro';
+// Floors and the under-construction switch live in src/data/elevatorPitch.ts
 ---
 
-<section class="section paper" id="elevator-pitch">
+<section class="section yellow" id="elevator-pitch">
   <div class="wrap stack">
-    <div class="crop"><i class="c1"></i><i class="c2"></i><h2 class="mega md">ELEVATOR PITCH</h2></div>
-    <div class="grid">
-      <div class="s5">
-        <div class="win">
-          <div class="bar"><span>elevator.pitch 0.1</span><span>▢</span></div>
-          <div class="bd">
-            <span>Loading ...</span>
-            <span>floor 0 of 6</span>
-            <div class="prog" aria-hidden="true"><i style="width:12%">12%</i></div>
-          </div>
-        </div>
-      </div>
-      <div class="col s7">
-        <span class="lbl">under construction</span>
-        <p class="lede">this page is still being built. come back soon.</p>
-      </div>
-    </div>
+    <div class="crop"><i class="c1"></i><i class="c2"></i><h2 class="mega md">MY ELEVATOR PITCH</h2></div>
+    <Elevator />
   </div>
 </section>

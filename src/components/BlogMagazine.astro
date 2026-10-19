@@ -14,9 +14,9 @@ function formatDate(d: string): string {
 ---
 
 {posts.length > 0 ? (
-  <div class="blog-magazine">
+  <div class="blog-magazine" data-blog>
     {posts.map((post, i) => (
-      <a href={post.link} target="_blank" rel="noopener noreferrer" class={`win blog-card ${i === 0 ? 'feat' : ''}`}>
+      <a href={post.link} target="_blank" rel="noopener noreferrer" class="win blog-card">
         <div class="bar"><span>{post.title}</span><span>{String(i + 1).padStart(2, '0')}</span></div>
         <div class="bd">
           <div class="blog-card-title">{post.title}</div>
@@ -32,3 +32,16 @@ function formatDate(d: string): string {
     <div class="bd"><span>No posts found. Check back soon.</span></div>
   </div>
 )}
+
+<script>
+  // Turn 1 to 4 random cards yellow on every visit
+  document.querySelectorAll<HTMLElement>('[data-blog]').forEach((list) => {
+    const cards = [...list.querySelectorAll<HTMLElement>('.blog-card')];
+    const count = Math.min(cards.length, 1 + Math.floor(Math.random() * 4));
+    cards
+      .map((card) => ({ card, r: Math.random() }))
+      .sort((a, b) => a.r - b.r)
+      .slice(0, count)
+      .forEach(({ card }) => card.classList.add('yellow'));
+  });
+</script>
