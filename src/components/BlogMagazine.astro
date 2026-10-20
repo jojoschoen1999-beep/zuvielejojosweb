@@ -34,9 +34,9 @@ function formatDate(d: string): string {
 )}
 
 <script>
-  // Turn 1 to 4 random cards yellow on every visit
+  // Turn 1 to 4 random cards yellow on every visit (only cards that are shown, so phones get some too)
   document.querySelectorAll<HTMLElement>('[data-blog]').forEach((list) => {
-    const cards = [...list.querySelectorAll<HTMLElement>('.blog-card')];
+    const cards = [...list.querySelectorAll<HTMLElement>('.blog-card')].filter((c) => c.offsetParent !== null);
     const count = Math.min(cards.length, 1 + Math.floor(Math.random() * 4));
     cards
       .map((card) => ({ card, r: Math.random() }))
