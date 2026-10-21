@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Mentions légales">
+  <section class="page">
+    <div class="wrap stack">
+      <div class="crop"><i class="c1"></i><i class="c2"></i><h1 class="mega md">MENTIONS LÉGALES</h1></div>
+
+      <div class="win legal-tldr">
+        <div class="bar"><span>legal.txt - zuvielejojos 1.1</span><span>▢</span></div>
+        <div class="bd">
+          <span>a personal website. no business, nothing for sale.</span>
+          <span>français d'abord, english below.</span>
+        </div>
+      </div>
+
+      <div class="legal" lang="fr">
+        <div class="col">
+          <span class="lbl">01. éditeur du site</span>
+          <p>zuvielejojos.xyz est un site personnel et non professionnel, édité par Johanna Schön, particulier, à Paris (France).<br />
+          contact : <a href="mailto:jojoschoen1999@gmail.com">jojoschoen1999@gmail.com</a></p>
+          <p>conformément à l'article 6, III-2 de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique (LCEN), les coordonnées personnelles de l'éditeur ont été communiquées à l'hébergeur.</p>
+        </div>
+
+        <div class="col">
+          <span class="lbl">02. directrice de la publication</span>
+          <p>Johanna Schön</p>
+        </div>
+
+        <div class="col">
+          <span class="lbl">03. hébergeur</span>
+          <p>Netlify, Inc.<br />
+          101 2nd Street, San Francisco, CA 94105, États-Unis<br />
+          <a href="mailto:support@netlify.com">support@netlify.com</a> · <a href="https://www.netlify.com" target="_blank" rel="noopener noreferrer">netlify.com</a></p>
+        </div>
+
+        <div class="col">
+          <span class="lbl">04. propriété intellectuelle</span>
+          <p>sauf mention contraire, les textes, images et le design de ce site appartiennent à Johanna Schön. merci de ne pas les réutiliser sans mon accord.</p>
+        </div>
+
+        <div class="col">
+          <span class="lbl">05. données personnelles</span>
+          <p>ce site n'utilise ni cookies ni outils d'analyse. tous les détails sont dans la <a href="/privacy">politique de confidentialité</a> (en anglais).</p>
+        </div>
+      </div>
+
+      <div class="crop"><i class="c1"></i><i class="c2"></i><h2 class="h2">legal notice (english)</h2></div>
+
+      <div class="legal" lang="en">
+        <div class="col">
+          <span class="lbl">01. publisher</span>
+          <p>zuvielejojos.xyz is a personal, non-commercial website published by Johanna Schön, a private person based in Paris, France.<br />
+          contact: <a href="mailto:jojoschoen1999@gmail.com">jojoschoen1999@gmail.com</a></p>
+          <p>as allowed by article 6, III-2 of the French law on confidence in the digital economy (LCEN), my personal contact details have been provided to the host.</p>
+        </div>
+
+        <div class="col">
+          <span class="lbl">02. publication director</span>
+          <p>Johanna Schön</p>
+        </div>
+
+        <div class="col">
+          <span class="lbl">03. host</span>
+          <p>Netlify, Inc., 101 2nd Street, San Francisco, CA 94105, USA · <a href="mailto:support@netlify.com">support@netlify.com</a></p>
+        </div>
+
+        <div class="col">
+          <span class="lbl">04. intellectual property</span>
+          <p>unless stated otherwise, the texts, images and design of this site belong to Johanna Schön. please don't reuse them without asking me first.</p>
+        </div>
+
+        <div class="col">
+          <span class="lbl">05. personal data</span>
+          <p>no cookies, no analytics. everything else is in the <a href="/privacy">privacy policy</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* the É accent needs room when the title wraps */
+  h1.mega { line-height: .95; }
+  .legal-tldr { max-width: 640px; justify-self: center; width: 100%; }
+  .legal { display: grid; gap: clamp(20px, 3.5vh, 36px); max-width: 760px; justify-self: center; width: 100%; }
+  .legal p { line-height: 1.35; }
+  .legal a { text-underline-offset: 2px; }
+</style>
