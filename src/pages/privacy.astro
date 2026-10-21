@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Privacy">
+  <section class="page">
+    <div class="wrap stack">
+      <div class="crop"><i class="c1"></i><i class="c2"></i><h1 class="mega md">PRIVACY</h1></div>
+
+      <div class="win privacy-tldr">
+        <div class="bar"><span>tldr.txt - zuvielejojos 1.1</span><span>▢</span></div>
+        <div class="bd">
+          <span>no cookies. no analytics. no ads. no tracking.</span>
+          <span>the only thing that happens: my web host keeps standard server logs so the site works and stays safe.</span>
+        </div>
+      </div>
+
+      <div class="privacy">
+        <div class="col">
+          <span class="lbl">01. who is responsible</span>
+          <p>this website is run by me, Johanna Schön (Jojo), a private person based in Paris, France. i am responsible for the processing of personal data on this site. you can reach me at <a href="mailto:jojoschoen1999@gmail.com">jojoschoen1999@gmail.com</a>.</p>
+        </div>
+
+        <div class="col">
+          <span class="lbl">02. what happens when you visit</span>
+          <p>this site is hosted by Netlify, Inc. (San Francisco, USA). when you open a page, your browser sends some technical data to Netlify's servers, as it would with any website: your IP address, the date and time, the page you requested, your browser and device type, and the page you came from. Netlify needs this to deliver the site and to protect it against abuse, and keeps it in server logs for a limited time.</p>
+          <p>legal basis: my legitimate interest in running a working, secure website (Art. 6(1)(f) GDPR). Netlify processes this data on my behalf. Netlify is certified under the EU-U.S. Data Privacy Framework, which covers the transfer to the USA. more in <a href="https://www.netlify.com/privacy/" target="_blank" rel="noopener noreferrer">Netlify's privacy policy</a>.</p>
+        </div>
+
+        <div class="col">
+          <span class="lbl">03. what this site does not do</span>
+          <p>no cookies, no analytics, no advertising, no social media plugins, no embedded videos or maps. the fonts and images are stored on this site itself, so your browser doesn't contact Google or anyone else to load them. the blog previews are fetched from Substack by the server, not by your browser, so Substack doesn't see your visit.</p>
+        </div>
+
+        <div class="col">
+          <span class="lbl">04. links to other sites</span>
+          <p>this site links to Substack, Instagram, LinkedIn and Google Calendar (for booking a meeting with me). nothing is sent to them until you click a link. once you do, you are on their site and their privacy policies apply. if you book a meeting, Google processes what you enter in the booking form, and i receive your name, email address and the time you picked so we can meet.</p>
+        </div>
+
+        <div class="col">
+          <span class="lbl">05. if you email me</span>
+          <p>i use your email address and whatever you write only to reply to you, and i keep the conversation as long as it is useful for that. my email is handled by Google (Gmail). legal basis: my legitimate interest in answering messages (Art. 6(1)(f) GDPR), or taking steps you asked for before working together (Art. 6(1)(b) GDPR).</p>
+        </div>
+
+        <div class="col">
+          <span class="lbl">06. your rights</span>
+          <p>you can ask me for access to your data, to correct or delete it, to restrict or object to its processing, and to get it in a portable format. just email me. you also have the right to complain to a data protection authority, in France the <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">CNIL</a>.</p>
+        </div>
+
+        <div class="col">
+          <span class="lbl">07. changes</span>
+          <p>if the site changes (say i ever add analytics), i will update this page. last updated: 21 october 2026.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .privacy-tldr { max-width: 640px; justify-self: center; width: 100%; }
+  .privacy { display: grid; gap: clamp(20px, 3.5vh, 36px); max-width: 760px; justify-self: center; width: 100%; }
+  .privacy p { line-height: 1.35; }
+  .privacy a { text-underline-offset: 2px; }
+</style>
