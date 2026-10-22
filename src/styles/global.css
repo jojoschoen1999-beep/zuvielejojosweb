@@ -96,6 +96,8 @@ main { flex: 1; position: relative; }
 .chip.solid { background: var(--ink); color: var(--paper); }
 .chip.solid:hover { background: var(--pink); color: var(--ink); }
 .chip.lg { font-size: 17px; padding: 9px 16px; }
+.chip.yellow { background: var(--yellow); color: var(--ink); }
+.chip.yellow:hover { background: var(--ink); color: var(--yellow); }
 .chip:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
 
 .brand-wrap { justify-self: center; position: relative; display: inline-block; text-decoration: none; }
@@ -184,6 +186,9 @@ p { max-width: 60ch; }
 .dither { position: relative; border: 1px solid var(--rule); overflow: hidden; padding: clamp(16px, 3vh, 36px); display: grid; place-items: center; background-image: radial-gradient(rgba(30,30,30,.22) .9px, transparent 1.1px); background-size: 4px 4px; }
 .pick-brain { width: min(360px, 75%, 48vh); height: auto; filter: grayscale(1) contrast(1.6) brightness(1.05); mix-blend-mode: multiply; transition: transform .15s ease-out; }
 .pick-brain.shake { animation: brainShake .4s ease-out; }
+.pick-brain.jump { animation: brainJump .35s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes brainJump { 0% { translate: 0 0; } 40% { translate: 0 -18px; } 100% { translate: 0 0; } }
+.pick-brain { cursor: pointer; }
 @keyframes brainShake { 0%{transform:rotate(0)} 20%{transform:rotate(3deg)} 40%{transform:rotate(-3deg)} 60%{transform:rotate(2deg)} 80%{transform:rotate(-1deg)} 100%{transform:rotate(0)} }
 .pick-cursor { position: fixed; width: 100px; height: auto; pointer-events: none; z-index: 300; filter: drop-shadow(2px 3px 6px rgba(0,0,0,.12)); display: none; }
 .brain-sparkle { position: fixed; color: var(--pink); -webkit-text-stroke: .5px var(--ink); pointer-events: none; opacity: 0; z-index: 10; }
@@ -252,9 +257,6 @@ p { max-width: 60ch; }
 .float-btn:hover { background: var(--pink); color: var(--ink); }
 .snake-float { left: max(14px, env(safe-area-inset-left, 0px)); }
 .ig-float { right: max(14px, env(safe-area-inset-right, 0px)); }
-.glider { display: grid; grid-template-columns: repeat(3, 8px); gap: 2px; padding: 3px; background: var(--paper); border: 1px solid var(--ink); }
-.glider b { width: 8px; height: 8px; background: var(--paper); }
-.glider b.on { background: var(--ink); }
 @media (max-width: 700px) { .snake-float { display: none; } }
 
 /* ── 404 page ── */

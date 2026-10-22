@@ -16,7 +16,7 @@
             <div class="cal" id="cal" aria-hidden="true"></div>
           </div>
         </div>
-        <div><a href="https://calendar.app.google/Jroj5WyvkbMetTgd6" target="_blank" rel="noopener noreferrer" class="chip solid lg">book a meeting</a></div>
+        <div><a href="https://calendar.app.google/Jroj5WyvkbMetTgd6" target="_blank" rel="noopener noreferrer" class="chip yellow lg">book a meeting</a></div>
       </div>
     </div>
   </div>
@@ -41,7 +41,7 @@
       }).join('');
   }
 
-  // Hand cursor shows only over the brain area; brain shakes and drops sparkles
+  // Hand cursor shows only over the brain area; brain shakes and drops sparkles, and jumps when clicked
   const cursorEl = document.getElementById('cursor-hand');
   const pickArea = document.getElementById('pickArea');
   const pickBrain = document.getElementById('pickBrain');
@@ -67,18 +67,29 @@
     if (dist < rect.width * 0.6) {
       if (!brainShaking) {
         brainShaking = true;
+        pickBrain.classList.remove('jump');
         pickBrain.classList.add('shake');
-        pickBrain.addEventListener('animationend', () => {
+        setTimeout(() => {
           pickBrain.classList.remove('shake');
           brainShaking = false;
-        }, { once: true });
+        }, 400);
       }
       const now = Date.now();
-      if (now - sparkleThrottle > 150) {
+      if (now - sparkleThrottle > 70) {
         sparkleThrottle = now;
+        spawnSparkle(rect);
         spawnSparkle(rect);
       }
     }
+  });
+
+  pickBrain?.addEventListener('click', () => {
+    // restart the jump even if it's still running, then burst sparkles
+    pickBrain.classList.remove('shake', 'jump');
+    void pickBrain.offsetWidth;
+    pickBrain.classList.add('jump');
+    const rect = pickBrain.getBoundingClientRect();
+    for (let i = 0; i < 14; i++) setTimeout(() => spawnSparkle(rect), i * 25);
   });
 
   function spawnSparkle(brainRect: DOMRect) {
