@@ -134,9 +134,8 @@ const navRight = [
     <script>
       // Discovery score: what counts and how much (adds up to 100). Saved in this browser only.
       const FINDS: Record<string, number> = {
-        thoughts: 7, 'elevator-pitch': 7, 'pick-my-brain': 7, about: 7, footer: 6,
-        elevator: 6, brain: 6, post: 7, wordmark: 5, bored: 7, book: 5, social: 5,
-        privacy: 12, mentions: 13,
+        thoughts: 10, 'elevator-pitch': 10, 'pick-my-brain': 10, about: 10, footer: 10,
+        bored: 10, privacy: 20, mentions: 20,
       };
       const KEY = 'zj-discovery', MAIL = 'zj-discovery-mail';
       const read = (k: string) => { try { return localStorage.getItem(k); } catch { return null; } };
@@ -226,18 +225,6 @@ const navRight = [
       if (path === '/privacy') score('privacy');
       if (path === '/mentions-legales') score('mentions');
       if (path === '/snake') score('bored');
-
-      // Clicks and hovers
-      document.addEventListener('click', e => {
-        const t = e.target as HTMLElement;
-        if (t.closest('[data-elevator] button')) score('elevator');
-        else if (t.closest('#pickBrain, #pickArea')) score('brain');
-        else if (t.closest('.blog-card')) score('post');
-        else if (t.closest('.snake-float')) score('bored');
-        else if (t.closest('a[href*="calendar.app.google"], a[href^="mailto:"]')) score('book');
-        else if (t.closest('a[href*="instagram.com"], a[href*="linkedin.com"], a[href*="substack.com"]')) score('social');
-      });
-      document.getElementById('brandWrap')?.addEventListener('mouseenter', () => score('wordmark'));
 
       render();
       checkScroll();
