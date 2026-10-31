@@ -1,0 +1,445 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+// Hidden page: only reachable through the "looking for your sparkle?" pop-up over the footer sparkles.
+// noindex keeps it out of search results. Built once at deploy time (prerender).
+export const prerender = true;
+//
+// Set up like a little course: an intro, then one lesson per band.
+// Everything below in quotes is placeholder text to replace.
+// image: a path in /public (e.g. '/images/sparkle/hobby.jpg'), url: a link. Both can stay empty.
+
+const rule = 'rule number 1: sparkles are like printers. They smell fear. Never let your sparkle know you’re looking for him.';
+const intro = [
+  'Have you ever had an important day ahead & tried to fall asleep while thinking “I should fall asleep soon”? Well, doing something purely in the hopes of getting your sparkle back is going to work just as great.',
+  'As a creative strategist my sparkle is incredibly important, if I ever really lost it I’d probably have to become a lawyer or smth. In order to avoid that, I have created a life for myself that shields the flame of my sparkles as good as possible. Since I don’t believe in gatekeeping I wrote down my most important tips, tricks & habits:',
+];
+
+// Photos for the feature lesson, piled up like windows on a desktop. First one lies on top.
+// x / y / w are percentages of the pile. The last photo can't be closed.
+type Photo = { src: string; alt: string; x: number; y: number; w: number };
+type Item = { name: string; by?: string; text: string[]; url?: string; image?: string; photos?: Photo[] };
+type Lesson = { id: string; no: string; title: string; short?: string; why?: string; intro?: string; cover?: 'square' | 'book'; kind: 'feature' | 'trio' | 'habits'; file?: string; cta?: string; items: Item[] };
+
+const lessons: Lesson[] = [
+  { id: 'hobby', no: '01', title: 'a creative hobby without any ambition', short: 'a creative hobby', kind: 'feature',
+    items: [{
+      name: 'polymer clay',
+      text: [
+        'This can be absolutely anything, the only thing that’s important is that 1. It’s creative 2. You are not trying to capitalise it. In my case it’s polymer clay.',
+        'Sometimes I’m even a tiny bit cringed by the fact how bad I am after more than 2 years of very regularly doing it, but the whole point is that I don’t ever even try to improve. I like the vibrant colours and mixing them, I like the fact that I can’t use my phone while doing so, I like the fact that i am not even trying to improve. I do not want to commercialise this hobby, i have no intention of creating an instagram account to share my process or whatever else people tend to ruin their hobby with.',
+        'i usually just pick 3 colours, knead them for 20mins either in silence or while listening to a podcast and that’s it. highly recommend it.',
+      ],
+      photos: [
+        { src: '/images/sparkle/clay-rings-1.jpg', alt: 'Four chunky polymer clay rings with plastic gems on a hand', x: 6, y: 0, w: 50 },
+        { src: '/images/sparkle/clay-dishes.jpg', alt: 'Six marbled polymer clay dishes in mixed colours', x: 0, y: 34, w: 84 },
+        { src: '/images/sparkle/clay-rings-2.jpg', alt: 'A wavy pink ring, a ring with three gems and a blue stacked ring on a hand', x: 46, y: 6, w: 50 },
+        { src: '/images/sparkle/clay-stacks.jpg', alt: 'A table full of stacked, coiled polymer clay pieces in every colour', x: 2, y: 26, w: 96 },
+      ],
+    }] },
+  { id: 'podcasts', no: '02', title: '3 podcasts that i recommend', short: '3 podcasts', kind: 'trio', file: 'podcast', cta: 'listen',
+    intro: 'i purposely don’t listen to podcasts about creativity. hearing how other people found their career paths, or someone thinking out loud about philosophy, sparks way more in me than one more episode on “how to be creative”. so here are my 3:',
+    items: [
+      { name: 'Dialectic', by: 'with Jackson Dahl', text: [], url: 'https://open.spotify.com/show/2IEN4eE9HvNKJHnLv5EMG9', image: '/images/sparkle/podcast-dialectic.jpg' },
+      { name: 'Julian de Medeiros', by: 'a youtube channel, but i listen to it like a podcast', text: [], url: 'https://www.youtube.com/@julianphilosophy/videos', image: '/images/sparkle/podcast-julian.jpg' },
+      { name: 'What’s Contemporary Now?', by: 'with Christopher Michael', text: [], url: 'https://open.spotify.com/show/2EE94lsDxhHH2RFUPTHCzj', image: '/images/sparkle/podcast-whats-contemporary-now.jpg' },
+    ] },
+  { id: 'books', no: '03', title: '3 books that i recommend', short: '3 books', kind: 'trio', file: 'book', cover: 'book',
+    intro: 'won’t leave any links here cause you better move your little butt to your next bookshop & not dare to order these on amazon',
+    items: [
+      { name: 'Didion & Babitz', by: 'Lili Anolik', text: ['2 of my idols, always a good idea to read about great women.'], image: '/images/sparkle/book-didion-babitz.jpg' },
+      { name: 'Self', by: 'Barry Dainton / Philosophy in Transit', text: ['not the kind of book you will read 2h at once in, but small bites here and there do wonders.'], image: '/images/sparkle/book-self.jpg' },
+      { name: 'The Artist’s Way', by: 'Julia Cameron', text: ['The most cliché one of them all, but even after more than 30 years still a great way to get inspired again.'], image: '/images/sparkle/book-artists-way.jpg' },
+    ] },
+  { id: 'habits', no: '04', title: '3 habits that i recommend', short: '3 habits', kind: 'habits',
+    items: [
+      { name: 'journaling', text: ['every morning, before I dare to start doomscrolling, i write 2 pages of whatever is in my head. no rules, no re-reading. A habit so life-changing that I’ve had ex-boyfriends ask “did you journal this morning?” the same way people ask cranky toddlers if they had their nap today… you gotta do what you gotta do, I guess.'] },
+      { name: 'working out', text: ['not for the looks, for the brain. some of my best ideas show up halfway through a workout, right when you think you might puke from exhaustion. I chose Lagree and running as my fighters, but I assume any sport that really pushes you to your limit does the job.'] },
+      { name: 'clean space', text: ['a messy desk is a messy brain. i clear my table before i start anything creative, else I won’t be fully relaxed.'] },
+    ] },
+];
+const bands = ['pink', 'paper', 'yellow'];
+
+// Pixel magic wand next to the title, drawn on a grid at build time (no work for the browser).
+// k ink outline, y sunny yellow, o pink shading, w highlight, p light pink glow.
+const WAND_COLORS: Record<string, string> = { k: '#1E1E1E', y: '#FFE45C', o: '#F386A1', w: '#FEFEFE', p: '#F9C8D5' };
+const STAR = [
+  '......k......',
+  '.....kyk.....',
+  '.....kyk.....',
+  '....kywyk....',
+  'kkkkkywyykkkk',
+  'kyyyyywyyyyok',
+  '.kyyyyyyyyok.',
+  '..kyyyyyyok..',
+  '...kyyyyyk...',
+  '..kyyyokyyk..',
+  '..kyyok.kyok.',
+  '.kyok....kok.',
+  '.kkk......kk.',
+];
+function wandSVG() {
+  const N = 26, g = Array.from({ length: N }, () => Array(N).fill('.'));
+  // stick: a 2-wide diagonal with ink edges, from the star down to the bottom right
+  for (let t = 0; t < 14; t++) {
+    const x = 9 + t, y = 9 + t;
+    if (x + 2 >= N || y >= N) break;
+    g[y][x - 1] = 'k'; g[y][x] = 'y'; g[y][x + 1] = 'o'; g[y][x + 2] = 'k';
+  }
+  g[23][21] = g[23][22] = g[23][23] = 'k';
+  STAR.forEach((row, j) => [...row].forEach((c, i) => { if (c !== '.') g[j + 1][i + 1] = c; }));
+  // glow: an offset shadow down and to the right
+  const glow: [number, number][] = [];
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++)
+    if (g[y][x] === '.' && ((x > 0 && g[y][x - 1] !== '.') || (y > 0 && g[y - 1][x] !== '.'))) glow.push([x, y]);
+  glow.forEach(([x, y]) => (g[y][x] = 'p'));
+  let r = '';
+  g.forEach((row, y) => row.forEach((c, x) => { if (c !== '.') r += `<rect x="${x}" y="${y}" width="1" height="1" fill="${WAND_COLORS[c]}"/>`; }));
+  return `<svg viewBox="0 0 ${N} ${N}" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">${r}</svg>`;
+}
+const wand = wandSVG();
+
+// Permanent sparkles around the title: [left %, top %, size px, colour, glyph]
+const sparkles: [number, number, number, string, string][] = [
+  [2, 10, 26, 'ink', '✦'], [7, 74, 18, 'pink', '✧'], [12, 34, 14, 'deep', '✦'], [18, 96, 22, 'pink', '✦'],
+  [24, 4, 16, 'deep', '✧'], [33, 88, 14, 'ink', '✧'], [40, 0, 24, 'pink', '✦'], [49, 96, 18, 'deep', '✦'],
+  [58, 6, 14, 'ink', '✧'], [66, 92, 26, 'pink', '✦'], [73, 46, 14, 'deep', '✧'], [80, 98, 16, 'ink', '✦'],
+  [96, 62, 22, 'pink', '✧'], [99, 90, 16, 'deep', '✦'], [5, 46, 12, 'pink', '✦'], [92, 4, 14, 'deep', '✧'],
+];
+---
+
+<BaseLayout title="Sparkle revival 101" noindex>
+  <section class="section yellow sp-intro">
+    <div class="wrap stack">
+      <div class="crop sp-crop"><i class="c1"></i><i class="c2"></i>
+        {sparkles.map(([x, y, size, col, ch], i) => (
+          <span class={`sp-perm ${col}`} style={`left:${x}%;top:${y}%;font-size:${size}px;animation-delay:${(i * 0.27).toFixed(2)}s`} aria-hidden="true">{ch}</span>
+        ))}
+        <h1 class="mega">SPARKLE<br />REVIVAL 101</h1>
+        <div class="sp-wand" aria-hidden="true" set:html={wand} />
+      </div>
+      <div class="sp-intro-grid">
+        <div class="sp-intro-text">
+          <p class="sp-lede">{rule}</p>
+          {intro.map((t) => <p>{t}</p>)}
+        </div>
+        <div class="win sp-syllabus">
+          <div class="bar"><span>syllabus.txt - zuvielejojos 1.1</span><span>✦</span></div>
+          <div class="bd">
+            <span>course: sparkle revival 101</span>
+            <span>level: anyone</span>
+            <span>gatekeeping: none</span>
+            <span>homework: optional</span>
+            <nav class="sp-toc" aria-label="Lessons">
+              {lessons.map((l) => <a href={`#${l.id}`}><span>{l.no}</span>{l.short ?? l.title}<span>▸</span></a>)}
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {lessons.map((l, i) => (
+    <section class={`section ${bands[i % bands.length]} sp-band`} id={l.id}>
+      <div class="wrap stack">
+        <div class="sp-head">
+          <div class="sp-title"><span class="tag">lesson.{l.no}</span><h2 class="h2">{l.title}</h2></div>
+          {l.why && <p class="sp-why">{l.why}</p>}
+        </div>
+        {l.intro && <p class="sp-lesson-intro">{l.intro}</p>}
+
+        {l.kind === 'feature' && l.items.map((it) => (
+          <div class="sp-feature">
+            <div class="sp-stack">
+              {it.photos?.map((ph, n, all) => (
+                <div class="win sp-ex" style={`left:${ph.x}%;top:${ph.y}%;width:${ph.w}%;z-index:${all.length - n}`}>
+                  <div class="bar">
+                    <span>example {n + 1}</span>
+                    {n < all.length - 1 ? <button type="button" class="sp-x" aria-label={`Close example ${n + 1}`}>x</button> : <span>&#9634;</span>}
+                  </div>
+                  <div class="bd"><img src={ph.src} alt={ph.alt} loading="lazy" /></div>
+                </div>
+              ))}
+            </div>
+            <div class="col">
+              <span class="lbl">my choice:</span>
+              <h3 class="sp-name big">{it.name}</h3>
+              {it.text.map((t) => <p>{t}</p>)}
+            </div>
+          </div>
+        ))}
+
+        {l.kind === 'trio' && (
+          <div class="sp-trio">
+            {l.items.map((it, n) => {
+              const Card = it.url ? 'a' : 'div';
+              return (
+                <Card class="win sp-card" {...(it.url ? { href: it.url, target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                  <div class="bar"><span>{l.file}.0{n + 1}</span><span>&#9634;</span></div>
+                  <div class="bd">
+                    {it.image ? <img class={`sp-img ${l.cover ?? ''}`} src={it.image} alt="" loading="lazy" /> : <div class="sp-img dither"><span>cover.jpg</span></div>}
+                    <h3 class="sp-name">{it.name}</h3>
+                    {it.by && <span class="lbl">{it.by}</span>}
+                    {it.text.map((t) => <p>{t}</p>)}
+                    {it.url && <span class="wbtn">{l.cta} ▸</span>}
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+
+        {l.kind === 'habits' && (
+          <div class="grid">
+            {l.items.map((it, n) => (
+              <div class="col s4 skill">
+                <span class="tag">✦ habit.0{n + 1}</span>
+                <span class="skill-name">{it.name.toUpperCase()}</span>
+                {it.text.map((t) => <p>{t}</p>)}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  ))}
+
+  <section class="sp-outro">
+    <div class="wrap sp-outro-in">
+      <h2 class="h2">good luck.</h2>
+      <p>test here if your sparkle is already back ✦</p>
+      <!-- Tiny paint program: one small canvas, only the site colours, no libraries -->
+      <div class="win sp-paint">
+        <div class="bar"><span>untitled - paint.exe</span><span>&#9634;</span></div>
+        <div class="sp-paint-menu" aria-hidden="true"><span>file</span><span>edit</span><span>view</span><span>colors</span><span>help</span></div>
+        <div class="sp-paint-body">
+          <div class="sp-tools" role="group" aria-label="Brush size">
+            <button type="button" class="wbtn on" data-size="2">pen</button>
+            <button type="button" class="wbtn" data-size="6">big</button>
+            <button type="button" class="wbtn" data-erase>erase</button>
+            <button type="button" class="wbtn" data-clear>new</button>
+            <button type="button" class="wbtn" data-save>save</button>
+          </div>
+          <canvas class="sp-canvas" width="240" height="150" aria-label="Drawing area"></canvas>
+        </div>
+        <div class="sp-palette" role="group" aria-label="Colours">
+          <button type="button" class="on" style="--c: var(--ink)" data-color="#1E1E1E" aria-label="Ink"></button>
+          <button type="button" style="--c: #8A8A8A" data-color="#8A8A8A" aria-label="Dark grey"></button>
+          <button type="button" style="--c: var(--win)" data-color="#DEDEDE" aria-label="Grey"></button>
+          <button type="button" style="--c: #D9466F" data-color="#D9466F" aria-label="Deep pink"></button>
+          <button type="button" style="--c: var(--pink)" data-color="#F386A1" aria-label="Pink"></button>
+          <button type="button" style="--c: #F9C8D5" data-color="#F9C8D5" aria-label="Light pink"></button>
+          <button type="button" style="--c: #FFE45C" data-color="#FFE45C" aria-label="Sunny yellow"></button>
+          <button type="button" style="--c: var(--yellow)" data-color="#FFFCB8" aria-label="Yellow"></button>
+        </div>
+        <div class="sp-status">for help, ask your sparkle.</div>
+      </div>
+      <a href="/" class="chip yellow lg sp-home">back home</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // Magic wand: sparkles keep dripping off the star while the header is on screen
+  const wandEl = document.querySelector<HTMLElement>('.sp-wand');
+  const crop = wandEl?.parentElement;
+  if (wandEl && crop && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let timer = 0;
+    const drip = () => {
+      const w = wandEl.getBoundingClientRect(), b = crop.getBoundingClientRect();
+      const s = document.createElement('span');
+      s.className = 'sp-drip';
+      s.textContent = Math.random() < .6 ? '✦' : '✧';
+      s.style.left = w.left - b.left + w.width * .3 + Math.random() * 20 - 10 + 'px';
+      s.style.top = w.top - b.top + w.height * .3 + 'px';
+      s.style.fontSize = 10 + Math.random() * 14 + 'px';
+      s.style.color = ['var(--ink)', 'var(--pink)', '#D9466F'][Math.floor(Math.random() * 3)];
+      s.style.setProperty('--dx', Math.random() * 60 - 40 + 'px');
+      s.style.setProperty('--dy', 80 + Math.random() * 120 + 'px');
+      s.addEventListener('animationend', () => s.remove());
+      crop.appendChild(s);
+    };
+    // only drip while the title is visible, so it costs nothing further down the page
+    new IntersectionObserver(([e]) => {
+      clearInterval(timer);
+      if (e.isIntersecting) timer = window.setInterval(drip, 220);
+    }).observe(crop);
+  }
+
+  // Paint window: draws chunky pixels (the canvas is small and scaled up)
+  const canvas = document.querySelector<HTMLCanvasElement>('.sp-canvas');
+  const paint = canvas?.getContext('2d');
+  if (canvas && paint) {
+    const PAPER = '#FEFEFE';
+    let color = '#1E1E1E', size = 2, erasing = false, last: [number, number] | null = null;
+    const clear = () => { paint.fillStyle = PAPER; paint.fillRect(0, 0, canvas.width, canvas.height); };
+    const at = (e: PointerEvent): [number, number] => {
+      const r = canvas.getBoundingClientRect();
+      return [Math.floor((e.clientX - r.left) * canvas.width / r.width), Math.floor((e.clientY - r.top) * canvas.height / r.height)];
+    };
+    // fill every pixel square between two points, so fast strokes don't leave gaps
+    const line = ([x0, y0]: [number, number], [x1, y1]: [number, number]) => {
+      paint.fillStyle = erasing ? PAPER : color;
+      const steps = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), 1);
+      for (let i = 0; i <= steps; i++) {
+        const x = Math.round(x0 + (x1 - x0) * i / steps), y = Math.round(y0 + (y1 - y0) * i / steps);
+        paint.fillRect(x - Math.floor(size / 2), y - Math.floor(size / 2), size, size);
+      }
+    };
+    clear();
+    canvas.addEventListener('pointerdown', (e) => { canvas.setPointerCapture(e.pointerId); last = at(e); line(last, last); });
+    canvas.addEventListener('pointermove', (e) => { if (!last) return; const p = at(e); line(last, p); last = p; });
+    const stop = () => { last = null; };
+    canvas.addEventListener('pointerup', stop);
+    canvas.addEventListener('pointercancel', stop);
+
+    const win = canvas.closest('.sp-paint')!;
+    const tools = win.querySelectorAll<HTMLButtonElement>('[data-size], [data-erase]');
+    const mark = (btn: HTMLButtonElement) => tools.forEach((b) => b.classList.toggle('on', b === btn));
+    win.querySelectorAll<HTMLButtonElement>('[data-size]').forEach((b) => b.addEventListener('click', () => { size = Number(b.dataset.size); erasing = false; mark(b); }));
+    win.querySelector<HTMLButtonElement>('[data-erase]')?.addEventListener('click', (e) => { erasing = true; size = 8; mark(e.currentTarget as HTMLButtonElement); });
+    win.querySelector('[data-clear]')?.addEventListener('click', clear);
+
+    // Save: redraws the whole paint window (frame + drawing at 3x) into a PNG and downloads it
+    win.querySelector('[data-save]')?.addEventListener('click', async () => {
+      await document.fonts.load('26px VT323').catch(() => {});
+      const k = 3, W = canvas.width * k, H = canvas.height * k;
+      const out = document.createElement('canvas');
+      out.width = W + 32; out.height = H + 100;
+      const o = out.getContext('2d')!;
+      o.imageSmoothingEnabled = false;
+      o.fillStyle = '#1E1E1E'; o.fillRect(0, 0, out.width, out.height);         // ink border
+      o.fillStyle = '#DEDEDE'; o.fillRect(2, 38, out.width - 4, out.height - 40); // grey window
+      o.fillStyle = '#FEFEFE'; o.font = '26px VT323'; o.textBaseline = 'middle';
+      o.fillText('untitled - paint.exe', 12, 20);
+      o.strokeStyle = '#FEFEFE'; o.lineWidth = 2; o.strokeRect(out.width - 30, 11, 16, 16);
+      o.fillStyle = '#1E1E1E'; o.fillRect(14, 50, W + 4, H + 4);                // frame around the drawing
+      o.drawImage(canvas, 16, 52, W, H);
+      o.fillRect(2, H + 66, out.width - 4, 2);
+      o.font = '22px VT323'; o.fillText('made with sparkle on zuvielejojos.xyz ✦', 12, H + 84);
+      const a = document.createElement('a');
+      a.download = 'my-sparkle.png';
+      a.href = out.toDataURL('image/png');
+      a.click();
+    });
+    const swatches = win.querySelectorAll<HTMLButtonElement>('[data-color]');
+    swatches.forEach((b) => b.addEventListener('click', () => {
+      color = b.dataset.color!;
+      swatches.forEach((s) => s.classList.toggle('on', s === b));
+      if (erasing) { erasing = false; size = 2; mark(win.querySelector<HTMLButtonElement>('[data-size="2"]')!); }
+    }));
+  }
+
+  // Example photos: the little x closes a window and shows the one underneath
+  document.querySelectorAll<HTMLButtonElement>('.sp-x').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const win = btn.closest('.sp-ex');
+      if (!win) return;
+      win.classList.add('closing');
+      setTimeout(() => win.remove(), 180);
+    });
+  });
+
+  // Sparkles trail behind the cursor (mouse only, and not for people who prefer less motion)
+  if (matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let last = 0, lx = 0, ly = 0;
+    addEventListener('mousemove', (e) => {
+      const now = performance.now();
+      if (now - last < 35 || Math.hypot(e.clientX - lx, e.clientY - ly) < 10) return;
+      last = now; lx = e.clientX; ly = e.clientY;
+      if ((e.target as HTMLElement).closest?.('.sp-paint')) return; // no sparkles over the drawing
+      const onInk = !!(e.target as HTMLElement).closest?.('.sp-outro, .footer');
+      const colors = onInk ? ['var(--yellow)', 'var(--pink)', 'var(--paper)'] : ['var(--ink)', 'var(--pink)', 'var(--paper)'];
+      const s = document.createElement('span');
+      s.className = 'sp-trail';
+      s.textContent = Math.random() < .6 ? '✦' : '✧';
+      s.style.left = e.clientX + (Math.random() * 16 - 8) + 'px';
+      s.style.top = e.clientY + (Math.random() * 16 - 8) + 'px';
+      s.style.fontSize = 10 + Math.random() * 12 + 'px';
+      s.style.color = colors[Math.floor(Math.random() * colors.length)];
+      s.addEventListener('animationend', () => s.remove());
+      document.body.appendChild(s);
+    });
+  }
+</script>
+
+<style>
+  /* header wand + sparkles */
+  .sp-crop .mega { position: relative; z-index: 2; }
+  .sp-wand { position: absolute; z-index: 3; right: -2%; top: -6%; width: clamp(80px, 13vw, 190px); rotate: -8deg; pointer-events: none; }
+  .sp-wand :global(svg) { display: block; width: 100%; height: auto; }
+  .sp-perm { position: absolute; z-index: 1; line-height: 1; translate: -50% -50%; pointer-events: none; }
+  .sp-perm.ink { color: var(--ink); } .sp-perm.pink { color: var(--pink); } .sp-perm.deep { color: #D9466F; }
+  :global(.sp-drip) { position: absolute; z-index: 4; line-height: 1; pointer-events: none; translate: -50% -50%; animation: spDrip 1.8s ease-in forwards; }
+  @keyframes spDrip { 0% { opacity: 1; transform: translate(0, 0) scale(1); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.4); } }
+  @media (prefers-reduced-motion: no-preference) {
+    .sp-wand { animation: spBob 1.4s steps(2, jump-none) infinite; }
+    .sp-perm { animation: spTwinkle 1.6s steps(2, jump-none) infinite; }
+  }
+  @keyframes spBob { 0% { translate: 0 0; } 100% { translate: 0 -6px; } }
+  .sp-intro { overflow-x: clip; } /* the wand and falling sparkles never cause sideways scrolling */
+  @media (max-width: 600px) { .sp-wand { width: 64px; right: -1%; top: -14%; } }
+  @keyframes spTwinkle { 0% { opacity: 1; transform: scale(1); } 100% { opacity: .2; transform: scale(.6); } }
+  .sp-intro-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(24px, 4vw, 64px); align-items: start; }
+  .sp-intro-text { display: grid; gap: 16px; max-width: 58ch; }
+  .sp-intro-text p { font-size: 18px; line-height: 1.4; }
+  .sp-intro-text .sp-lede { font-size: clamp(22px, 2.2vw, 30px); line-height: 1.2; font-weight: 500; }
+  .sp-syllabus .bd { gap: 4px; }
+  .sp-toc { display: grid; gap: 4px; margin-top: 10px; }
+  .sp-toc a { display: grid; grid-template-columns: 34px 1fr auto; background: var(--paper); border: 1px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); padding: 2px 8px; color: var(--ink); text-decoration: none; }
+  .sp-toc a:hover { background: var(--yellow); }
+
+  .sp-band.section { padding-block: clamp(56px, 10vh, 112px); scroll-margin-top: var(--hdr); }
+  .sp-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px 32px; }
+  .sp-title { display: grid; gap: 12px; }
+  .sp-why { font-family: var(--font-pixel); font-size: 22px; line-height: 1.05; max-width: 32ch; }
+
+  .sp-feature { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: clamp(24px, 4vw, 64px); align-items: center; }
+  .sp-feature p { font-size: 18px; line-height: 1.4; max-width: 52ch; }
+  /* pile of example windows; the last one sits at the bottom and stays */
+  .sp-stack { position: relative; width: 100%; max-width: 520px; aspect-ratio: 46 / 50; justify-self: center; }
+  .sp-ex { position: absolute; transition: opacity .18s, transform .18s; }
+  .sp-ex.closing { opacity: 0; transform: scale(.96); }
+  .sp-ex .bd { padding: 6px; }
+  .sp-ex img { display: block; width: 100%; height: auto; border: 1px solid var(--ink); }
+  .sp-x { background: none; border: 0; padding: 0 2px; color: var(--paper); font: inherit; line-height: 1; cursor: pointer; }
+  .sp-x:hover { color: var(--pink); }
+  .sp-trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2.5vw, 32px); align-items: start; }
+  .sp-card .bd { gap: 10px; }
+  .sp-card p { font-family: var(--font-body); font-size: 15px; line-height: 1.3; letter-spacing: .02em; }
+  .sp-card .wbtn { justify-self: start; }
+  a.sp-card { display: block; color: var(--ink); text-decoration: none; transition: transform .15s, box-shadow .15s; }
+  a.sp-card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 rgba(0,0,0,.3); }
+  a.sp-card:hover .wbtn { background: var(--yellow); }
+  .sp-lesson-intro { font-size: 18px; line-height: 1.4; max-width: 60ch; }
+  .sp-img { display: grid; place-items: center; width: 100%; aspect-ratio: 1; object-fit: cover; border: 1px solid var(--ink); background-color: var(--paper); }
+  /* book covers: shown whole at their own shape, so each box fits its book */
+  .sp-img.book { aspect-ratio: auto; height: auto; }
+  .sp-img span { background: var(--paper); border: 1px solid var(--ink); padding: 1px 6px; }
+  .sp-name { font-family: var(--font-display); font-weight: 500; font-size: 22px; line-height: 1; letter-spacing: 0; margin: 0; }
+  .sp-name.big { font-size: clamp(32px, 4vw, 52px); line-height: .9; }
+
+  .sp-outro { background: var(--ink); color: var(--paper); padding-block: clamp(64px, 12vh, 128px); border-bottom: 1px solid rgba(254,254,254,.15); }
+  .sp-outro-in { display: grid; justify-items: center; gap: 18px; text-align: center; }
+  .sp-outro p { font-family: var(--font-pixel); font-size: 24px; }
+  .sp-home { display: none; } /* phones only, desktop has the menu */
+  @media (max-width: 860px) { .sp-home { display: inline-flex; } }
+  .sp-paint { width: min(560px, 100%); }
+  .sp-paint-menu { display: flex; gap: 14px; padding: 2px 8px; border-bottom: 1px solid var(--ink); font-size: 18px; }
+  .sp-paint-body { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; padding: 8px; }
+  .sp-tools { display: grid; gap: 6px; align-content: start; }
+  .sp-tools .wbtn { padding: 1px 8px; }
+  .sp-tools .wbtn.on { background: var(--yellow); box-shadow: none; transform: translate(2px, 2px); }
+  .sp-canvas { display: block; width: 100%; height: auto; border: 1px solid var(--ink); background: var(--paper); image-rendering: pixelated; cursor: crosshair; touch-action: none; }
+  .sp-palette { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 8px 8px; }
+  .sp-palette button { width: 28px; height: 28px; background: var(--c); border: 1px solid var(--ink); cursor: pointer; padding: 0; }
+  .sp-palette button.on { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .sp-status { border-top: 1px solid var(--ink); padding: 2px 8px; font-size: 17px; }
+
+  @media (max-width: 860px) {
+    .sp-intro-grid, .sp-feature { grid-template-columns: minmax(0, 1fr); }
+    .sp-trio { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  :global(.sp-trail) { position: fixed; z-index: 300; pointer-events: none; line-height: 1; translate: -50% -50%; animation: spTrail .9s ease-out forwards; }
+  @keyframes spTrail { 0% { opacity: 1; transform: scale(1) rotate(0); } 100% { opacity: 0; transform: translateY(28px) scale(.3) rotate(40deg); } }
+</style>

@@ -80,6 +80,7 @@ const floors = elevatorPitch.map(({ heading, subheading, text, image, imageAlt }
     const floors: Floor[] = JSON.parse(root.dataset.floors || '[]');
     const wip = root.dataset.wip === '1';
     const N = floors.length;
+    if (!N) return; // no floors, nothing to draw
     const stage = root.querySelector<HTMLElement>('[data-stage]')!;
     const cv = root.querySelector<HTMLCanvasElement>('[data-canvas]')!;
     const g = cv.getContext('2d')!;

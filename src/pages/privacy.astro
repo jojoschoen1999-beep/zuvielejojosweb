@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+// Built once at deploy time, so it keeps working even if the server function fails.
+export const prerender = true;
 ---
 
 <BaseLayout title="Privacy">

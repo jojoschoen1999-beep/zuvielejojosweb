@@ -9,6 +9,7 @@ const { posts } = Astro.props;
 
 function formatDate(d: string): string {
   const date = new Date(d);
+  if (isNaN(date.getTime())) return '';
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
 }
 ---
@@ -21,7 +22,7 @@ function formatDate(d: string): string {
         <div class="bd">
           <div class="blog-card-title">{post.title}</div>
           {post.excerpt && <div class="blog-card-sub">{post.excerpt}</div>}
-          <div class="blog-card-meta">{formatDate(post.pubDate)} &middot; JOJO SCHÖN</div>
+          <div class="blog-card-meta">{formatDate(post.pubDate) && <>{formatDate(post.pubDate)} &middot; </>}JOJO SCHÖN</div>
         </div>
       </a>
     ))}

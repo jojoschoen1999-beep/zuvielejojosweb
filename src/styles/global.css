@@ -319,3 +319,10 @@ a.wbtn { text-decoration: none; display: inline-block; }
 @media (min-width: 861px) { .float-btn { bottom: calc(40px + env(safe-area-inset-bottom, 0px)); } }
 @media (max-width: 860px) { .ds, .ds-plus, .ds-letter, .ds-photo { display: none !important; } }
 @media (prefers-reduced-motion: reduce) { .ds-letter, .ds-letter svg, .ds-photo, .ds-plus.go, .ds-hint i { animation: none; } }
+
+/* ── Hidden sparkle door: a system message pops up over the footer sparkles ── */
+.spark-zone { position: relative; }
+.spark-ask { position: absolute; z-index: 5; top: 50%; width: min(300px, 100%); color: var(--ink); translate: -50% -50%; }
+.spark-ask[hidden] { display: none; }
+.footer .spark-ask a.wbtn { color: var(--ink); }
+@media (prefers-reduced-motion: no-preference) { .spark-ask { animation: nfPop .28s cubic-bezier(.34, 1.56, .64, 1) both; } }

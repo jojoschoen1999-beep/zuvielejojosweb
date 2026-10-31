@@ -3,8 +3,9 @@ import '../styles/global.css';
 interface Props {
   title: string;
   onePage?: boolean;
+  noindex?: boolean;
 }
-const { title, onePage = false } = Astro.props;
+const { title, onePage = false, noindex = false } = Astro.props;
 // On the home page the nav scrolls to sections; elsewhere it jumps back to them.
 const base = onePage ? '' : '/';
 const navRight = [
@@ -21,6 +22,7 @@ const navRight = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>{title} — ZUVIELEJOJOS</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {noindex && <meta name="robots" content="noindex" />}
   </head>
   <body>
     <header class="header">
@@ -50,20 +52,33 @@ const navRight = [
     <footer class="footer">
       <div class="wrap stack">
         <div class="glyph" aria-hidden="true"><span>✦ ✧</span><span>✧ ✦</span></div>
-        <div class="foot-mark-wrap" aria-hidden="true">
-          <span class="spark" style="left:2%;top:8%;font-size:30px;animation-delay:0s">✦</span>
-          <span class="spark p" style="left:9%;top:70%;font-size:22px;animation-delay:0.6s">✧</span>
-          <span class="spark w" style="left:16%;top:18%;font-size:18px;animation-delay:1.2s">✦</span>
-          <span class="spark" style="left:24%;top:82%;font-size:26px;animation-delay:0.3s">✧</span>
-          <span class="spark p" style="left:33%;top:4%;font-size:20px;animation-delay:1.6s">✦</span>
-          <span class="spark w" style="left:46%;top:90%;font-size:18px;animation-delay:0.9s">✧</span>
-          <span class="spark" style="left:58%;top:2%;font-size:24px;animation-delay:1.9s">✦</span>
-          <span class="spark p" style="left:67%;top:86%;font-size:20px;animation-delay:0.4s">✦</span>
-          <span class="spark w" style="left:76%;top:10%;font-size:18px;animation-delay:1.4s">✧</span>
-          <span class="spark" style="left:84%;top:74%;font-size:28px;animation-delay:0.7s">✦</span>
-          <span class="spark p" style="left:92%;top:22%;font-size:22px;animation-delay:1.1s">✧</span>
-          <span class="spark w" style="left:97%;top:64%;font-size:18px;animation-delay:2.1s">✦</span>
-          <div class="foot-mark">ZUVIELEJOJOS</div>
+        <div class="spark-zone">
+          <div class="foot-mark-wrap" aria-hidden="true" id="sparkHover">
+            <span class="spark" style="left:2%;top:8%;font-size:30px;animation-delay:0s">✦</span>
+            <span class="spark p" style="left:9%;top:70%;font-size:22px;animation-delay:0.6s">✧</span>
+            <span class="spark w" style="left:16%;top:18%;font-size:18px;animation-delay:1.2s">✦</span>
+            <span class="spark" style="left:24%;top:82%;font-size:26px;animation-delay:0.3s">✧</span>
+            <span class="spark p" style="left:33%;top:4%;font-size:20px;animation-delay:1.6s">✦</span>
+            <span class="spark w" style="left:46%;top:90%;font-size:18px;animation-delay:0.9s">✧</span>
+            <span class="spark" style="left:58%;top:2%;font-size:24px;animation-delay:1.9s">✦</span>
+            <span class="spark p" style="left:67%;top:86%;font-size:20px;animation-delay:0.4s">✦</span>
+            <span class="spark w" style="left:76%;top:10%;font-size:18px;animation-delay:1.4s">✧</span>
+            <span class="spark" style="left:84%;top:74%;font-size:28px;animation-delay:0.7s">✦</span>
+            <span class="spark p" style="left:92%;top:22%;font-size:22px;animation-delay:1.1s">✧</span>
+            <span class="spark w" style="left:97%;top:64%;font-size:18px;animation-delay:2.1s">✦</span>
+            <div class="foot-mark">ZUVIELEJOJOS</div>
+          </div>
+          <!-- Hidden way to /sparkle: pops up when you move over the sparkles -->
+          <div class="win spark-ask" id="sparkAsk" role="dialog" aria-label="System Message" hidden>
+            <div class="bar"><span>System Message</span><span>✦</span></div>
+            <div class="bd">
+              <span>looking for your sparkle?</span>
+              <div class="btnrow">
+                <a class="wbtn" href="/sparkle">yes</a>
+                <button class="wbtn" type="button" id="sparkNo">no</button>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="foot">
           <span>zuvielejojos © {new Date().getFullYear()} · <a href="/privacy">privacy</a> · <a href="/mentions-legales">mentions légales</a></span>
@@ -111,6 +126,22 @@ const navRight = [
         brandWrap.addEventListener('mouseleave', () => {
           document.querySelectorAll('.brand-star').forEach(s => s.classList.remove('visible'));
         });
+      }
+
+      // Sparkles in the footer: moving over them pops up "looking for your sparkle?" where the pointer is
+      const sparkHover = document.getElementById('sparkHover');
+      const sparkAsk = document.getElementById('sparkAsk');
+      let sparkAsked = false;
+      if (sparkHover && sparkAsk) {
+        sparkHover.addEventListener('pointerenter', (e) => {
+          if (sparkAsked) return;
+          sparkAsked = true;
+          const zone = sparkHover.getBoundingClientRect();
+          const half = Math.min(150, zone.width / 2);
+          sparkAsk.style.left = Math.max(half, Math.min(zone.width - half, e.clientX - zone.left)) + 'px';
+          sparkAsk.hidden = false;
+        });
+        document.getElementById('sparkNo')?.addEventListener('click', () => { sparkAsk.hidden = true; });
       }
 
       // Highlight the nav chip of the section you're looking at

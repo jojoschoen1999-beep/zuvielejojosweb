@@ -1,8 +1,9 @@
 ---
 import BlogMagazine from '../BlogMagazine.astro';
-import { fetchSubstackPosts } from '../../lib/substack';
+import type { Post } from '../../lib/substack';
 
-const posts = await fetchSubstackPosts(12);
+// The home page fetches the feed, so it can pick the cache time.
+const { posts } = Astro.props as { posts: Post[] };
 ---
 
 <section class="section pink" id="thoughts">

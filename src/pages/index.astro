@@ -5,15 +5,21 @@ import Thoughts from '../components/sections/Thoughts.astro';
 import ElevatorPitch from '../components/sections/ElevatorPitch.astro';
 import PickMyBrain from '../components/sections/PickMyBrain.astro';
 import About from '../components/sections/About.astro';
+import { fetchSubstackPosts } from '../lib/substack';
+
+const posts = await fetchSubstackPosts(12);
 
 // Let Netlify's CDN keep the page for 10 minutes, so the Substack feed
-// isn't fetched on every single visit (and a Substack outage doesn't break the page)
-Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=600, stale-while-revalidate=86400');
+// isn't fetched on every single visit (and a Substack outage doesn't break the page).
+// If the feed came back empty (Substack down), only keep it for a minute so the posts come back quickly.
+Astro.response.headers.set('Cache-Control', posts.length
+  ? 'public, max-age=0, s-maxage=600, stale-while-revalidate=86400'
+  : 'public, max-age=0, s-maxage=60');
 ---
 
 <BaseLayout title="Home" onePage>
   <Hero />
-  <Thoughts />
+  <Thoughts posts={posts} />
   <ElevatorPitch />
   <PickMyBrain />
   <About />
