@@ -1,0 +1,415 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import data from '../data/dialecticCircle.json';
+// The Dialectic Circle: who knows whom across 18 episodes of the Dialectic podcast.
+// Data comes from the episode transcripts and reference lists, plus research done with Claude.
+// Built once at deploy time; the graph itself runs in the browser with a bundled copy of d3 (no CDN).
+export const prerender = true;
+
+const nPeople = data.people.length;
+const nTies = data.ties.length;
+const nEps = Object.keys(data.episodes).length;
+
+// Permanent sparkles around the title: [left %, top %, size px, colour, glyph]
+const sparkles: [number, number, number, string, string][] = [
+  [3, 14, 22, 'blue', '✦'], [9, 80, 16, 'pink', '✧'], [20, 2, 14, 'ink', '✦'], [31, 94, 20, 'blue', '✧'],
+  [44, 4, 16, 'pink', '✦'], [57, 96, 14, 'ink', '✧'], [69, 6, 22, 'blue', '✦'], [80, 90, 16, 'pink', '✦'],
+  [91, 12, 18, 'ink', '✧'], [97, 70, 22, 'blue', '✦'],
+];
+---
+
+<BaseLayout title="The Dialectic Circle">
+  <section class="section yellow dc-intro">
+    <div class="wrap stack">
+      <div class="crop dc-crop"><i class="c1"></i><i class="c2"></i>
+        {sparkles.map(([x, y, size, col, ch], i) => (
+          <span class={`dc-perm ${col}`} style={`left:${x}%;top:${y}%;font-size:${size}px;animation-delay:${(i * 0.31).toFixed(2)}s`} aria-hidden="true">{ch}</span>
+        ))}
+        <span class="tag dc-tag">nerdstuff.01</span>
+        <h1 class="mega dc-mega">THE DIALECTIC<br /><span>CIRCLE</span></h1>
+      </div>
+      <div class="dc-intro-grid">
+        <div class="dc-intro-text">
+          <p class="dc-lede">i am absolutely obsessed with <a href="https://www.dialectic.fm" target="_blank" rel="noopener noreferrer">Dialectic</a>, the podcast by Jackson Dahl.</p>
+          <p>The best thing: he partners with notion (my second big love after claude) & every episode comes with a transcript full of links & references.</p>
+          <p>I never miss an episode & at some point I started feeling like I keep hearing the same names again and again, without always being able to connect the dots. who worked with whom? who invested in whom? and why does everyone seem to have passed through the same three companies at some point?</p>
+          <p>so i spent a wild Sunday night building this map with Claude, based on the Dialectic transcripts plus some extra research. it's a good place to start, and then you can do your own research.</p>
+        </div>
+        <div class="win dc-readme">
+          <div class="bar"><span>readme.txt</span><span>✦</span></div>
+          <div class="bd">
+            <span>episodes: {nEps}</span>
+            <span>people: {nPeople}</span>
+            <span>connections: {nTies}</span>
+            <span>built with: claude + the transcripts</span>
+            <span class="dc-warn">accuracy: no guarantee. people change jobs, research gets things wrong. double-check before you quote any of it.</span>
+            <div class="btnrow"><a class="wbtn" href="#map">open the map ▾</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section paper dc-band" id="map">
+    <div class="dc-wide stack">
+      <div class="dc-head">
+        <h2 class="h2">who knows whom</h2>
+        <p class="dc-how">click a dot to see who they are & who they're connected to. squares are dialectic guests.</p>
+      </div>
+
+      <div class="win dc-app">
+        <div class="bar"><span>dialectic-circle.exe</span><span>&#9634;</span></div>
+        <div class="dc-tools">
+          <label class="dc-search"><span class="visually-hidden">Find a person or company</span>
+            <input id="dcQ" type="search" placeholder="find a person or company" autocomplete="off" />
+          </label>
+          <div class="dc-chips" id="dcCats" role="group" aria-label="Filter by role"></div>
+          <div class="dc-chips" role="group" aria-label="Show">
+            <label class="dc-check"><input type="checkbox" id="dcMentions" checked /> episode lines</label>
+            <label class="dc-check"><input type="checkbox" id="dcFamous" /> very famous names</label>
+            <label class="dc-check"><input type="checkbox" id="dcLoose" /> people with no known ties</label>
+          </div>
+        </div>
+        <div class="dc-body">
+          <div class="dc-stage">
+            <svg id="dcGraph" role="img" aria-label="Network graph of people mentioned on Dialectic"></svg>
+            <div class="dc-zoom">
+              <button type="button" class="wbtn" id="dcIn" aria-label="Zoom in">+</button>
+              <button type="button" class="wbtn" id="dcOut" aria-label="Zoom out">−</button>
+              <button type="button" class="wbtn" id="dcFit" aria-label="Fit to screen">fit</button>
+            </div>
+            <div class="dc-legend" aria-hidden="true">
+              <span><svg width="22" height="6"><line x1="0" y1="3" x2="22" y2="3" class="dc-l" /></svg>worked together</span>
+              <span><svg width="22" height="6"><line x1="0" y1="3" x2="22" y2="3" class="dc-l invest" /></svg>invested</span>
+              <span><svg width="22" height="6"><line x1="0" y1="3" x2="22" y2="3" class="dc-l social" /></svg>friends / mentor</span>
+              <span><svg width="22" height="6"><line x1="0" y1="3" x2="22" y2="3" class="dc-l mention" /></svg>mentioned on their episode</span>
+            </div>
+          </div>
+          <aside class="dc-panel" id="dcPanel" aria-live="polite"></aside>
+        </div>
+        <div class="dc-status" id="dcStatus">loading…</div>
+      </div>
+
+      <p class="dc-foot">all credit for the conversations goes to <a href="https://www.dialectic.fm" target="_blank" rel="noopener noreferrer">Dialectic</a> & Jackson Dahl. this map is a fan project and not affiliated with the show.</p>
+    </div>
+  </section>
+
+  <script type="application/json" id="dcData" set:html={JSON.stringify(data)} />
+</BaseLayout>
+
+<script>
+  import { select } from 'd3-selection';
+  import { forceSimulation, forceLink, forceManyBody, forceCollide, forceX, forceY } from 'd3-force';
+  import { zoom as d3zoom, zoomIdentity } from 'd3-zoom';
+  import { drag } from 'd3-drag';
+  import { extent } from 'd3-array';
+  import 'd3-transition';
+
+  // Four role groups, coloured from the site palette (+ Dialectic blue)
+  const GROUPS = [
+    { id: 'build', label: 'founders & operators', cats: ['founder', 'operator', 'engineer', 'researcher'] },
+    { id: 'invest', label: 'investors', cats: ['investor'] },
+    { id: 'make', label: 'designers & creatives', cats: ['designer', 'creative'] },
+    { id: 'write', label: 'writers & media', cats: ['writer'] },
+  ];
+  const groupOf = (p: any) => {
+    const order = ['make', 'build', 'invest', 'write'];
+    return order.find((g) => GROUPS.find((x) => x.id === g)!.cats.some((c) => p.category?.includes(c))) || 'write';
+  };
+  const TIE_CLASS: Record<string, string> = { invested_in: 'invest', board: 'invest', acquired: 'invest', friend: 'social', mentor: 'social', family: 'social' };
+  const TIE_LABEL: Record<string, string> = { cofounded: 'co-founded', worked_together: 'worked together', invested_in: 'invested', investor_colleagues: 'same fund', mentor: 'mentor', friend: 'friends', family: 'family', board: 'board', acquired: 'acquired', collaborator: 'collaborated' };
+  const esc = (s: unknown) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
+
+  const D = JSON.parse(document.getElementById('dcData')!.textContent!);
+  const byName = new Map<string, any>(D.people.map((p: any) => [p.name, p]));
+  D.people.forEach((p: any) => { p.id = p.name; p.ties = []; p.g = groupOf(p); p.eps = p.eps || []; p.category = p.category || []; });
+  const ties = D.ties.filter((t: any) => byName.has(t.a) && byName.has(t.b) && t.a !== t.b);
+  ties.forEach((t: any) => { byName.get(t.a).ties.push({ other: t.b, ...t }); byName.get(t.b).ties.push({ other: t.a, ...t }); });
+  const guestsOf: Record<string, string[]> = {};
+  Object.entries<any>(D.episodes).forEach(([n, e]) => (guestsOf[n] = e.guests.filter((g: string) => byName.has(g))));
+  const mentions: any[] = [];
+  D.people.forEach((p: any) => p.eps.forEach((n: number) => (guestsOf[n] || []).forEach((g) => { if (g !== p.name) mentions.push({ a: g, b: p.name, type: 'mention' }); })));
+  D.people.forEach((p: any) => { p.deg = new Set(p.ties.map((t: any) => t.other)).size; p.reach = p.deg + p.eps.length; });
+
+  const state = { groups: new Set(GROUPS.map((g) => g.id)), ep: null as string | null, q: '', selected: null as string | null, mentions: true, famous: false, loose: false };
+
+  // ── controls
+  const catBox = document.getElementById('dcCats')!;
+  GROUPS.forEach((g) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = `dc-chip g-${g.id}`; b.setAttribute('aria-pressed', 'true');
+    b.innerHTML = `<i></i>${g.label}`;
+    b.onclick = () => { state.groups.has(g.id) ? state.groups.delete(g.id) : state.groups.add(g.id); b.setAttribute('aria-pressed', String(state.groups.has(g.id))); update(); };
+    catBox.append(b);
+  });
+  const cbM = document.getElementById('dcMentions') as HTMLInputElement, cbF = document.getElementById('dcFamous') as HTMLInputElement, cbL = document.getElementById('dcLoose') as HTMLInputElement;
+  cbM.onchange = () => { state.mentions = cbM.checked; build(); };
+  cbF.onchange = () => { state.famous = cbF.checked; build(); };
+  cbL.onchange = () => { state.loose = cbL.checked; build(); };
+  const q = document.getElementById('dcQ') as HTMLInputElement;
+  q.oninput = () => {
+    state.q = q.value.trim().toLowerCase(); update();
+    if (state.q) { const hit = curNodes.find((p) => p.name.toLowerCase().includes(state.q)); if (hit) focusNode(hit); }
+  };
+
+  // ── graph
+  const svg = select<SVGSVGElement, unknown>('#dcGraph');
+  const root = svg.append('g'), gl = root.append('g'), gn = root.append('g');
+  let zk = 1;
+  const zoomer = d3zoom<SVGSVGElement, unknown>().scaleExtent([0.2, 5]).on('zoom', (e) => { root.attr('transform', e.transform); zk = e.transform.k; labels(); });
+  svg.call(zoomer).on('dblclick.zoom', null);
+  let sim: any, linkSel: any, nodeSel: any, curNodes: any[] = [];
+  const visible = (p: any) => (state.famous || !p.famous) && (state.loose || p.deg > 0 || p.guest);
+  const size = (d: any) => (d.guest ? 9 : 3.5 + Math.min(8, Math.sqrt(d.reach) * 1.5));
+
+  function build() {
+    const nodes = D.people.filter(visible);
+    const ids = new Set(nodes.map((n: any) => n.id));
+    const links = ties.filter((t: any) => ids.has(t.a) && ids.has(t.b)).map((t: any) => ({ ...t, source: t.a, target: t.b, kind: 'tie' }));
+    if (state.mentions) mentions.filter((m) => ids.has(m.a) && ids.has(m.b)).forEach((m) => links.push({ ...m, source: m.a, target: m.b, kind: 'mention' }));
+    const first = !curNodes.length;
+    curNodes = nodes;
+    const { width, height } = svg.node()!.getBoundingClientRect();
+    linkSel = gl.selectAll('line').data(links, (d: any) => `${d.a}|${d.b}|${d.type}`).join('line')
+      .attr('class', (d: any) => 'dc-l ' + (d.kind === 'mention' ? 'mention' : TIE_CLASS[d.type] || ''));
+    nodeSel = gn.selectAll('g.dc-n').data(nodes, (d: any) => d.id).join((enter: any) => {
+      const g = enter.append('g').attr('class', (d: any) => `dc-n g-${d.g}` + (d.guest ? ' guest' : ''));
+      g.each(function (this: SVGGElement, d: any) {
+        const s = select(this), r = size(d);
+        if (d.guest) s.append('rect').attr('x', -r).attr('y', -r).attr('width', r * 2).attr('height', r * 2);
+        else s.append('circle').attr('r', r);
+      });
+      g.append('text').attr('dy', '0.32em').attr('x', (d: any) => size(d) + 4).text((d: any) => d.name);
+      return g;
+    })
+      .attr('tabindex', 0).attr('role', 'button').attr('aria-label', (d: any) => d.name)
+      .on('click', (e: any, d: any) => { e.stopPropagation(); choose(d.name); })
+      .on('keydown', (e: any, d: any) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(d.name); } })
+      .on('mouseenter', (_e: any, d: any) => hover(d)).on('mouseleave', () => hover(null))
+      .call(drag<any, any>()
+        .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.2).restart(); d.fx = d.x; d.fy = d.y; })
+        .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+        .on('end', (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+    if (sim) sim.stop();
+    sim = forceSimulation(nodes)
+      .force('link', forceLink(links).id((d: any) => d.id).distance((d: any) => (d.kind === 'mention' ? 110 : 55)).strength((d: any) => (d.kind === 'mention' ? 0.03 : 0.5)))
+      .force('charge', forceManyBody().strength((d: any) => (d.guest ? -420 : -140)))
+      .force('collide', forceCollide((d: any) => size(d) + 3))
+      .force('x', forceX(width / 2).strength(0.04)).force('y', forceY(height / 2).strength(0.05))
+      .on('tick', () => {
+        linkSel.attr('x1', (d: any) => d.source.x).attr('y1', (d: any) => d.source.y).attr('x2', (d: any) => d.target.x).attr('y2', (d: any) => d.target.y);
+        nodeSel.attr('transform', (d: any) => `translate(${d.x},${d.y})`);
+      });
+    if (first) { for (let i = 0; i < 240; i++) sim.tick(); sim.alpha(0.25); setTimeout(fit, 30); }
+    document.getElementById('dcStatus')!.textContent = `${nodes.length} people on screen · ${ties.length} researched connections · ${Object.keys(D.episodes).length} episodes`;
+    update();
+  }
+  const filtering = () => !!(state.q || state.ep || state.groups.size < GROUPS.length);
+  function matches(p: any) {
+    if (!state.groups.has(p.g)) return false;
+    if (state.ep && !p.eps.map(String).includes(state.ep) && !D.episodes[state.ep].guests.includes(p.name)) return false;
+    if (state.q && !(p.name.toLowerCase().includes(state.q) || (p.headline || '').toLowerCase().includes(state.q) || (p.orgs || []).some((o: any) => o.org.toLowerCase().includes(state.q)))) return false;
+    return true;
+  }
+  function labels() {
+    if (!nodeSel) return;
+    const sel = state.selected ? byName.get(state.selected) : null;
+    const nb = sel ? new Set([sel.name, ...sel.ties.map((t: any) => t.other)]) : null;
+    nodeSel.select('text').attr('display', (d: any) => (nb ? nb.has(d.name) : d.guest || d.reach >= 7 || zk > 1.6 || (filtering() && matches(d))) ? null : 'none');
+  }
+  function update() {
+    if (!nodeSel) return;
+    const sel = state.selected ? byName.get(state.selected) : null;
+    const nb = sel ? new Set([sel.name, ...sel.ties.map((t: any) => t.other)]) : null;
+    nodeSel.classed('dim', (d: any) => (nb ? !nb.has(d.name) : filtering() && !matches(d))).classed('on', (d: any) => d.name === state.selected);
+    linkSel.classed('dim', (d: any) => (nb ? !(d.source.id === sel.name || d.target.id === sel.name) : filtering() && !(matches(d.source) && matches(d.target))))
+      .classed('hot', (d: any) => !!nb && d.kind === 'tie' && (d.source.id === sel.name || d.target.id === sel.name));
+    labels();
+  }
+  function hover(d: any) {
+    if (state.selected) return;
+    if (!d) { update(); return; }
+    const nb = new Set([d.name, ...d.ties.map((t: any) => t.other)]);
+    nodeSel.classed('dim', (n: any) => !nb.has(n.name));
+    linkSel.classed('dim', (l: any) => !(l.source.id === d.name || l.target.id === d.name)).classed('hot', (l: any) => l.kind === 'tie' && (l.source.id === d.name || l.target.id === d.name));
+  }
+  function fit() {
+    const ns = curNodes.filter((n) => n.x != null); if (!ns.length) return;
+    const { width, height } = svg.node()!.getBoundingClientRect();
+    const x = extent(ns, (n: any) => n.x as number) as [number, number], y = extent(ns, (n: any) => n.y as number) as [number, number];
+    const k = Math.min(2, 0.9 / Math.max((x[1] - x[0]) / width, (y[1] - y[0]) / height));
+    svg.transition().duration(500).call(zoomer.transform, zoomIdentity.translate(width / 2, height / 2).scale(k).translate(-(x[0] + x[1]) / 2, -(y[0] + y[1]) / 2));
+  }
+  function focusNode(p: any) {
+    if (p?.x == null) return;
+    const { width, height } = svg.node()!.getBoundingClientRect();
+    svg.transition().duration(450).call(zoomer.transform, zoomIdentity.translate(width / 2, height / 2).scale(Math.max(zk, 1.4)).translate(-p.x, -p.y));
+  }
+  document.getElementById('dcIn')!.onclick = () => svg.transition().call(zoomer.scaleBy, 1.4);
+  document.getElementById('dcOut')!.onclick = () => svg.transition().call(zoomer.scaleBy, 1 / 1.4);
+  document.getElementById('dcFit')!.onclick = fit;
+  svg.on('click', () => { if (state.selected) { state.selected = null; update(); panel(); } });
+  addEventListener('resize', () => { if (!sim) return; const { width, height } = svg.node()!.getBoundingClientRect(); sim.force('x').x(width / 2); sim.force('y').y(height / 2); sim.alpha(0.2).restart(); });
+
+  function choose(name: string) {
+    const p = byName.get(name);
+    if (p && !visible(p)) { if (p.famous) { state.famous = cbF.checked = true; } if (!p.deg && !p.guest) { state.loose = cbL.checked = true; } build(); }
+    state.selected = name; update(); panel(); focusNode(p);
+  }
+
+  // ── side panel
+  const box = document.getElementById('dcPanel')!;
+  const row = (p: any, meta: string) => `<button type="button" class="dc-row" data-name="${esc(p.name)}"><i class="dc-dot g-${p.g}${p.guest ? ' sq' : ''}"></i><span class="dc-rn"><b>${esc(p.name)}</b><small>${esc(p.headline || '')}</small></span><span class="dc-meta">${meta}</span></button>`;
+  function panel() {
+    const p = state.selected ? byName.get(state.selected) : null;
+    if (!p) {
+      let h = `<span class="lbl">start here</span><p class="dc-p">pick an episode to light up everyone its guest mentioned.</p><div class="dc-eps">`;
+      Object.entries<any>(D.episodes).sort((a, b) => +b[0] - +a[0]).forEach(([n, e]) => {
+        h += `<button type="button" class="dc-ep" data-ep="${n}" aria-pressed="${state.ep === n}"><span>${n}</span>${esc(e.label)}</button>`;
+      });
+      h += `</div><span class="lbl">most connected</span><div class="dc-list">`;
+      D.people.filter((x: any) => !x.famous && !x.guest).sort((a: any, b: any) => b.deg - a.deg).slice(0, 10).forEach((x: any) => (h += row(x, `${x.deg} ties`)));
+      box.innerHTML = h + '</div>';
+      box.querySelectorAll<HTMLButtonElement>('[data-ep]').forEach((b) => (b.onclick = () => { state.ep = state.ep === b.dataset.ep ? null : b.dataset.ep!; update(); panel(); }));
+    } else {
+      const tags = [p.guest ? `dialectic guest · ep ${p.guest}` : '', p.otherGuest ? `dialectic guest · ep ${p.otherGuest}` : '', ...p.category].filter(Boolean);
+      const tieRows = [...p.ties].sort((a, b) => byName.get(b.other).reach - byName.get(a.other).reach)
+        .map((t) => `<button type="button" class="dc-tie" data-name="${esc(t.other)}"><span><b>${esc(t.other)}</b><em>${esc(TIE_LABEL[t.type] || t.type)}</em></span><small>${esc(t.note || '')}</small></button>`).join('');
+      const eps = p.eps.filter((n: number) => D.episodes[n]).map((n: number) => `<a href="${D.episodes[n].url}" target="_blank" rel="noopener noreferrer">ep ${n} · ${esc(D.episodes[n].label)}</a>`).join('');
+      box.innerHTML = `<button type="button" class="wbtn dc-back" id="dcBack">◂ back</button>
+        <h3 class="dc-name">${esc(p.name)}</h3>
+        ${p.headline ? `<p class="dc-headline">${esc(p.headline)}</p>` : ''}
+        <div class="dc-tags">${tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div>
+        ${p.notable ? `<p class="dc-p">${esc(p.notable)}</p>` : ''}
+        ${p.quote ? `<span class="lbl">how they came up</span><blockquote class="dc-quote">“${esc(p.quote[1])}”<cite>ep ${p.quote[0]} · ${esc(D.episodes[p.quote[0]]?.label || '')}</cite></blockquote>` : ''}
+        <span class="lbl">connections (${p.ties.length})</span>
+        <div class="dc-list">${tieRows || '<p class="dc-p">no researched connections yet, only episode mentions.</p>'}</div>
+        ${(p.orgs || []).length ? `<span class="lbl">career</span><ul class="dc-orgs">${p.orgs.map((o: any) => `<li><span>${esc(o.role ? o.role + ', ' : '')}<b>${esc(o.org)}</b></span><small>${esc(o.years || '')}</small></li>`).join('')}</ul>` : ''}
+        ${eps ? `<span class="lbl">mentioned in</span><div class="dc-links">${eps}</div>` : ''}
+        ${p.x || p.linkedin ? `<div class="dc-links dc-social">${p.x ? `<a href="${esc(p.x)}" target="_blank" rel="noopener noreferrer">x ▸</a>` : ''}${p.linkedin ? `<a href="${esc(p.linkedin)}" target="_blank" rel="noopener noreferrer">linkedin ▸</a>` : ''}</div>` : ''}
+        ${p.confidence && p.confidence !== 'high' ? `<p class="dc-conf">research confidence: ${esc(p.confidence)}. double-check this one.</p>` : ''}`;
+      document.getElementById('dcBack')!.onclick = () => { state.selected = null; update(); panel(); };
+    }
+    box.querySelectorAll<HTMLButtonElement>('[data-name]').forEach((b) => (b.onclick = () => choose(b.dataset.name!)));
+    box.scrollTop = 0;
+  }
+
+  build();
+  panel();
+</script>
+
+<style is:global>
+  :root { --dblue: #0A1FF5; --sun: #FFE45C; }
+  .dc-wide .visually-hidden, .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* intro */
+  .dc-intro { overflow-x: clip; }
+  .dc-crop { display: grid; justify-items: center; gap: 14px; }
+  .dc-tag { justify-self: center; position: relative; z-index: 2; }
+  .dc-mega { position: relative; z-index: 2; }
+  .dc-mega span { color: var(--dblue); }
+  .dc-perm { position: absolute; z-index: 1; line-height: 1; translate: -50% -50%; pointer-events: none; }
+  .dc-perm.ink { color: var(--ink); } .dc-perm.pink { color: var(--pink); } .dc-perm.blue { color: var(--dblue); }
+  @media (prefers-reduced-motion: no-preference) { .dc-perm { animation: dcTwinkle 1.6s steps(2, jump-none) infinite; } }
+  @keyframes dcTwinkle { 0% { opacity: 1; transform: scale(1); } 100% { opacity: .2; transform: scale(.6); } }
+  .dc-intro-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: clamp(24px, 4vw, 64px); align-items: start; }
+  .dc-intro-text { display: grid; gap: 16px; max-width: 58ch; }
+  .dc-intro-text p { font-size: 18px; line-height: 1.4; }
+  .dc-intro-text .dc-lede { font-size: clamp(22px, 2.2vw, 30px); line-height: 1.2; font-weight: 500; }
+  .dc-intro-text a { color: var(--dblue); text-underline-offset: 3px; }
+  .dc-readme .bd { gap: 4px; }
+  .dc-warn { margin-top: 6px; background: var(--paper); border: 1px solid var(--ink); padding: 4px 8px; }
+  .dc-readme .btnrow { justify-content: flex-start; margin-top: 8px; }
+
+  /* map band */
+  .dc-band.section { padding-block: clamp(48px, 8vh, 96px); scroll-margin-top: var(--hdr); }
+  .dc-wide { max-width: 1440px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); gap: 20px; }
+  .dc-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px 32px; }
+  .dc-how { font-family: var(--font-pixel); font-size: 22px; line-height: 1.05; max-width: 36ch; }
+  .dc-app { font-size: 18px; box-shadow: 6px 6px 0 var(--dblue); }
+  .dc-tools { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 8px; border-bottom: 1px solid var(--ink); }
+  .dc-search input { font-family: var(--font-body); font-size: 15px; letter-spacing: 0; padding: 5px 8px; border: 1px solid var(--ink); background: var(--paper); width: min(260px, 100%); border-radius: 0; }
+  .dc-search { flex: 0 1 260px; min-width: 0; }
+  .dc-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .dc-chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-pixel); font-size: 18px; line-height: 1; padding: 3px 8px; background: var(--paper); border: 1px solid var(--ink); cursor: pointer; color: var(--ink); }
+  .dc-chip[aria-pressed="false"] { opacity: .4; }
+  .dc-chip i { width: 10px; height: 10px; border: 1px solid var(--ink); border-radius: 50%; }
+  .dc-check { display: inline-flex; align-items: center; gap: 5px; font-size: 18px; cursor: pointer; }
+  .dc-check input { accent-color: var(--dblue); }
+
+  /* role colours, shared by graph dots, chips and list dots */
+  .g-build { --gc: var(--dblue); } .g-invest { --gc: var(--pink); } .g-make { --gc: var(--sun); } .g-write { --gc: var(--paper); }
+  .dc-chip i, .dc-dot { background: var(--gc); }
+
+  .dc-body { display: grid; grid-template-columns: minmax(0, 1fr) 340px; height: min(78vh, 820px); min-height: 520px; }
+  .dc-stage { position: relative; min-width: 0; background: var(--paper); background-image: radial-gradient(rgba(30,30,30,.16) .8px, transparent 1px); background-size: 6px 6px; border-right: 1px solid var(--ink); overflow: hidden; }
+  #dcGraph { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+  #dcGraph:active { cursor: grabbing; }
+  .dc-n circle, .dc-n rect { fill: var(--gc); stroke: var(--ink); stroke-width: 1; }
+  .dc-n.guest rect { stroke-width: 2; }
+  .dc-n.on circle, .dc-n.on rect { stroke-width: 3; }
+  .dc-n text { font-family: var(--font-body); font-size: 11px; letter-spacing: 0; fill: var(--ink); paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
+  .dc-n.guest text { font-weight: 500; font-size: 12.5px; }
+  .dc-n { cursor: pointer; }
+  .dc-n:focus-visible { outline: none; }
+  .dc-n:focus-visible circle, .dc-n:focus-visible rect { stroke: var(--pink); stroke-width: 3; }
+  .dc-n.dim { opacity: .12; }
+  .dc-l { stroke: var(--ink); stroke-opacity: .55; stroke-width: 1.2; }
+  .dc-l.invest { stroke-dasharray: 4 3; }
+  .dc-l.social { stroke-dasharray: 1 3; stroke-linecap: round; stroke-width: 1.8; }
+  .dc-l.mention { stroke: var(--ink); stroke-opacity: .12; stroke-width: .8; }
+  .dc-l.dim { stroke-opacity: .04; }
+  .dc-l.hot { stroke: var(--dblue); stroke-opacity: 1; stroke-width: 2.2; }
+  .dc-legend svg .dc-l.mention { stroke-opacity: .3; }
+  .dc-zoom { position: absolute; right: 10px; top: 10px; display: flex; gap: 6px; }
+  .dc-zoom .wbtn { padding: 1px 9px; }
+  .dc-legend { position: absolute; left: 10px; bottom: 10px; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 16px; background: var(--paper); border: 1px solid var(--ink); padding: 3px 8px; max-width: calc(100% - 20px); }
+  .dc-legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+  .dc-panel { overflow: auto; background: var(--win); padding: 12px; display: grid; gap: 10px; align-content: start; }
+  .dc-panel .lbl { margin-top: 6px; }
+  .dc-p { font-family: var(--font-body); font-size: 14px; line-height: 1.35; letter-spacing: .02em; }
+  .dc-eps { display: grid; gap: 3px; }
+  .dc-ep { display: grid; grid-template-columns: 30px 1fr; text-align: left; background: var(--paper); border: 1px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); padding: 2px 8px; font: inherit; font-size: 18px; color: var(--ink); cursor: pointer; }
+  .dc-ep:hover { background: var(--yellow); }
+  .dc-ep[aria-pressed="true"] { background: var(--dblue); color: var(--paper); }
+  .dc-list { display: grid; gap: 4px; }
+  .dc-row, .dc-tie { display: grid; text-align: left; background: var(--paper); border: 1px solid var(--ink); padding: 6px 8px; font: inherit; color: var(--ink); cursor: pointer; }
+  .dc-row { grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+  .dc-row:hover, .dc-tie:hover { background: var(--yellow); }
+  .dc-dot { width: 10px; height: 10px; border: 1px solid var(--ink); border-radius: 50%; }
+  .dc-dot.sq { border-radius: 0; }
+  .dc-rn { display: grid; min-width: 0; }
+  .dc-rn b, .dc-tie b { font-family: var(--font-body); font-weight: 500; font-size: 14px; letter-spacing: 0; }
+  .dc-rn small, .dc-tie small { font-family: var(--font-body); font-size: 12px; letter-spacing: .01em; line-height: 1.25; color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; }
+  .dc-rn small { white-space: nowrap; }
+  .dc-meta { font-size: 16px; white-space: nowrap; }
+  .dc-tie { gap: 2px; }
+  .dc-tie span { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+  .dc-tie em { font-style: normal; font-size: 16px; background: var(--ink); color: var(--paper); padding: 0 5px; }
+  .dc-back { justify-self: start; }
+  .dc-name { font-family: var(--font-display); font-weight: 500; font-size: 30px; line-height: .95; letter-spacing: -.01em; text-wrap: balance; }
+  .dc-headline { font-family: var(--font-body); font-size: 15px; font-weight: 500; letter-spacing: .01em; line-height: 1.25; }
+  .dc-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .dc-quote { font-family: var(--font-body); font-size: 14px; line-height: 1.35; letter-spacing: .01em; background: var(--paper); border: 1px solid var(--ink); border-left: 4px solid var(--dblue); padding: 8px 10px; }
+  .dc-quote cite { display: block; margin-top: 6px; font-style: normal; font-family: var(--font-mono); font-weight: 300; font-size: 11px; }
+  .dc-orgs { list-style: none; display: grid; gap: 4px; font-family: var(--font-body); font-size: 13px; letter-spacing: .01em; line-height: 1.25; }
+  .dc-orgs li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+  .dc-orgs b { font-weight: 500; }
+  .dc-orgs small { font-family: var(--font-mono); font-weight: 300; font-size: 11px; white-space: nowrap; }
+  .dc-links { display: grid; gap: 2px; font-size: 18px; }
+  .dc-links a { color: var(--dblue); }
+  .dc-social { display: flex; gap: 14px; }
+  .dc-conf { font-size: 17px; color: var(--ink-soft); }
+  .dc-status { border-top: 1px solid var(--ink); padding: 2px 8px; font-size: 17px; }
+  .dc-foot { font-size: 14px; color: var(--ink-soft); }
+  .dc-foot a { color: var(--dblue); }
+
+  @media (max-width: 900px) {
+    .dc-intro-grid { grid-template-columns: minmax(0, 1fr); }
+    .dc-body { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 0; }
+    .dc-stage { height: 64vh; min-height: 380px; border-right: 0; border-bottom: 1px solid var(--ink); }
+    .dc-panel { max-height: none; }
+    .dc-legend { font-size: 14px; }
+  }
+</style>

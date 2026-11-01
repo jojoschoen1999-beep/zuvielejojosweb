@@ -9,7 +9,13 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@astrojs/netlify": "^5.5.0",
     "astro": "^4.16.0",
-    "@astrojs/netlify": "^5.5.0"
+    "d3-array": "^3.2.4",
+    "d3-drag": "^3.0.0",
+    "d3-force": "^3.0.0",
+    "d3-selection": "^3.0.0",
+    "d3-transition": "^3.0.1",
+    "d3-zoom": "^3.0.0"
   }
 }

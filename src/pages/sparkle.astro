@@ -17,7 +17,7 @@ const intro = [
 // Photos for the feature lesson, piled up like windows on a desktop. First one lies on top.
 // x / y / w are percentages of the pile. The last photo can't be closed.
 type Photo = { src: string; alt: string; x: number; y: number; w: number };
-type Item = { name: string; by?: string; text: string[]; url?: string; image?: string; photos?: Photo[] };
+type Item = { name: string; by?: string; text: string[]; url?: string; cta?: string; image?: string; photos?: Photo[] };
 type Lesson = { id: string; no: string; title: string; short?: string; why?: string; intro?: string; cover?: 'square' | 'book'; kind: 'feature' | 'trio' | 'habits'; file?: string; cta?: string; items: Item[] };
 
 const lessons: Lesson[] = [
@@ -39,7 +39,7 @@ const lessons: Lesson[] = [
   { id: 'podcasts', no: '02', title: '3 podcasts that i recommend', short: '3 podcasts', kind: 'trio', file: 'podcast', cta: 'listen',
     intro: 'i purposely don’t listen to podcasts about creativity. hearing how other people found their career paths, or someone thinking out loud about philosophy, sparks way more in me than one more episode on “how to be creative”. so here are my 3:',
     items: [
-      { name: 'Dialectic', by: 'with Jackson Dahl', text: [], url: 'https://open.spotify.com/show/2IEN4eE9HvNKJHnLv5EMG9', image: '/images/sparkle/podcast-dialectic.jpg' },
+      { name: 'Dialectic', by: 'with Jackson Dahl', text: ['ps: i love Dialectic so much that i built a little map of all the founders, investors & creatives they keep mentioning.'], url: '/nerdstuff', cta: 'check this out', image: '/images/sparkle/podcast-dialectic.jpg' },
       { name: 'Julian de Medeiros', by: 'a youtube channel, but i listen to it like a podcast', text: [], url: 'https://www.youtube.com/@julianphilosophy/videos', image: '/images/sparkle/podcast-julian.jpg' },
       { name: 'What’s Contemporary Now?', by: 'with Christopher Michael', text: [], url: 'https://open.spotify.com/show/2EE94lsDxhHH2RFUPTHCzj', image: '/images/sparkle/podcast-whats-contemporary-now.jpg' },
     ] },
@@ -173,21 +173,20 @@ const sparkles: [number, number, number, string, string][] = [
             {l.items.map((it, n) => {
               const Card = it.url ? 'a' : 'div';
               return (
-                <Card class="win sp-card" {...(it.url ? { href: it.url, target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                <Card class="win sp-card" {...(it.url ? (it.url.startsWith('/') ? { href: it.url } : { href: it.url, target: '_blank', rel: 'noopener noreferrer' }) : {})}>
                   <div class="bar"><span>{l.file}.0{n + 1}</span><span>&#9634;</span></div>
                   <div class="bd">
                     {it.image ? <img class={`sp-img ${l.cover ?? ''}`} src={it.image} alt="" loading="lazy" /> : <div class="sp-img dither"><span>cover.jpg</span></div>}
                     <h3 class="sp-name">{it.name}</h3>
                     {it.by && <span class="lbl">{it.by}</span>}
                     {it.text.map((t) => <p>{t}</p>)}
-                    {it.url && <span class="wbtn">{l.cta} ▸</span>}
+                    {it.url && <span class="wbtn">{it.cta ?? l.cta} ▸</span>}
                   </div>
                 </Card>
               );
             })}
           </div>
         )}
-
         {l.kind === 'habits' && (
           <div class="grid">
             {l.items.map((it, n) => (
@@ -410,8 +409,7 @@ const sparkles: [number, number, number, string, string][] = [
   a.sp-card { display: block; color: var(--ink); text-decoration: none; transition: transform .15s, box-shadow .15s; }
   a.sp-card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 rgba(0,0,0,.3); }
   a.sp-card:hover .wbtn { background: var(--yellow); }
-  .sp-lesson-intro { font-size: 18px; line-height: 1.4; max-width: 60ch; }
-  .sp-img { display: grid; place-items: center; width: 100%; aspect-ratio: 1; object-fit: cover; border: 1px solid var(--ink); background-color: var(--paper); }
+  .sp-lesson-intro { font-size: 18px; line-height: 1.4; max-width: 60ch; }  .sp-img { display: grid; place-items: center; width: 100%; aspect-ratio: 1; object-fit: cover; border: 1px solid var(--ink); background-color: var(--paper); }
   /* book covers: shown whole at their own shape, so each box fits its book */
   .sp-img.book { aspect-ratio: auto; height: auto; }
   .sp-img span { background: var(--paper); border: 1px solid var(--ink); padding: 1px 6px; }
